@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { signInWithGoogle } from '@/lib/api/auth';
 import { useState } from 'react';
 
 interface AuthFormProps {
@@ -31,8 +33,15 @@ export default function AuthForm({ type, onSubmit, role }: AuthFormProps) {
     }
   };
 
-
-
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle(role)
+    } catch (error: any) {
+      console.error('Google sign in error:', error)
+      setError(error);
+      // Optionally show error to user
+    }
+  }
   
 
   return (
@@ -169,7 +178,7 @@ export default function AuthForm({ type, onSubmit, role }: AuthFormProps) {
 
       <button
         type="submit"
-        className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-all duration-300 
+        className={`w-full py-3 px-4 rounded-lg cursor-pointer font-semibold text-white transition-all duration-300 
           ${role === 'candidate' 
             ? 'bg-[var(--primary-600)] hover:bg-[var(--primary-700)]' 
             : 'bg-[var(--secondary-600)] hover:bg-[var(--secondary-700)]'} 
@@ -178,7 +187,7 @@ export default function AuthForm({ type, onSubmit, role }: AuthFormProps) {
         disabled={isSubmitting}
       >
         {isSubmitting ? (
-          <div className="flex items-center justify-center space-x-2">
+          <div className="flex items-center justify-center  space-x-2">
             <span className="loader w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
             <span>{type === 'login' ? 'Logging in...' : 'Registering...'}</span>
           </div>
@@ -191,10 +200,7 @@ export default function AuthForm({ type, onSubmit, role }: AuthFormProps) {
 
       <button
         type="button"
-        onClick={() => {
-          // Call your Google sign-in function here
-          console.log('Sign in/up with Google');
-        }}
+        onClick={handleGoogleSignIn}
         className="w-full py-3 px-4 cursor-pointer rounded-lg font-medium text-[color:var(--neutral-700)] bg-white border border-[color:var(--neutral-300)] hover:bg-gray-100 flex items-center justify-center gap-2 shadow-sm mt-2"
       >
         <img

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // lib/api/auth.ts
+import { supabase } from '@/lib/supabase/client'
 
 
 export async function loginUser(email: string, password: string, role: 'candidate' | 'recruiter') {
@@ -65,4 +66,46 @@ export function getRole(){
 export function logout() {
   localStorage.removeItem('access_token');
   localStorage.removeItem('role');
+}
+
+
+
+export async function signInWithGoogle(role: 'candidate' | 'recruiter') {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/callback?role=${role}`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    }
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export async function handleAuthCallback() {
+  const { data, error } = await supabase.auth.getSession()
+  
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data.session
+}
+
+// Get user from Supabase directly
+export async function getCurrentUser() {
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return user
 }
