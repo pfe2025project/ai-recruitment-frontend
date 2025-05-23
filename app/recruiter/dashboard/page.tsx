@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 
 export default function RecruiterDashboard() {
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // 👈 Add loading state
   const router = useRouter();
 
   useEffect(() => {
@@ -20,22 +19,7 @@ export default function RecruiterDashboard() {
     router.push('/login');
   };
 
-  if (loading) {
-    // Show nothing or a loading spinner
-    return (
-      <div className="text-center mt-10 text-xl text-gray-600">
-        Checking authentication...
-      </div>
-    );
-  }
 
-  // if (!hasAccess) {
-  //   return (
-  //     <div className="text-center mt-10 text-xl text-red-600">
-  //       You do not have access to this page.
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="text-center text-2xl mt-10">

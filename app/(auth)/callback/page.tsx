@@ -10,6 +10,7 @@ export default function AuthCallback() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState('')
+  const [role, setRole] = useState<'candidate' | 'recruiter'>('candidate');
   
   useEffect(() => {
     const handleCallback = async () => {
@@ -26,7 +27,9 @@ export default function AuthCallback() {
         if (!user) {
           throw new Error('User not found')
         }
-        const role = searchParams.get('role') || 'candidate'
+        const roleParam = searchParams.get('role');
+        const validRole = roleParam === 'recruiter' ? 'recruiter' : 'candidate';
+        setRole(validRole);
 
         // Register user in our backend
         const response = await fetch('http://127.0.0.1:5000/auth/google-callback', {
@@ -80,5 +83,5 @@ export default function AuthCallback() {
     )
   }
 
-  return <Loader role="candidate" />
+  return <Loader role={role} />
 }
