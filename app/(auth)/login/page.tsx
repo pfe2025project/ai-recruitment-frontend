@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
@@ -6,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RoleToggle from '@/components/auth/RoleToggle';
 import AuthForm from '@/components/auth/AuthForm';
-import { isAuthenticated, loginUser } from '@/lib/api/auth';
+import { isAuthenticated, loginUser, getRole } from '@/lib/api/auth'; // Importez getRole
 import Loader from '@/components/ui/loader';
 
 
@@ -17,22 +18,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Vérifie si l'utilisateur est déjà authentifié au chargement de la page
     if (isAuthenticated()) {
-      const r = localStorage.getItem('role');
-      if (r === 'candidate') router.push('/candidate/dashboard');
-      else if (r === 'recruiter') router.push('/recruiter/dashboard');
-     
-    } else{
-      setLoading(false)
+      const storedRole = getRole(); // Utilise la fonction getRole de lib/api/auth
+      if (storedRole === 'candidate') {
+        router.push('/candidate/dashboard');
+      } else if (storedRole === 'recruiter') {
+        router.push('/recruiter/dashboard');
+      } else {
+        // Si le rôle n'est pas clair, peut-être déconnecter ou rediriger vers une page neutre
+        // Pour l'instant, on redirige vers le login si le rôle est inconnu mais que isAuthenticated est true
+        setLoading(false); 
+      }
+    } else {
+      setLoading(false); // Arrête le chargement si non authentifié
     }
-    
-  }, [loading, router]);
+  }, [router]); // Supprime `loading` des dépendances car il est mis à jour à l'intérieur
 
   if (loading) {
-      return <Loader role='candidate' />;
+      return <Loader role='candidate' />; // Vous pouvez ajuster le 'role' ici si nécessaire, ou le rendre plus générique
   }
-
-
 
   const handleSubmit = async (
     e: React.FormEvent,
@@ -42,30 +47,23 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-  
-
     try {
+      // loginUser() gère désormais l'authentification avec Supabase
+      // et la synchronisation avec votre backend Flask,
+      // ainsi que le stockage des informations dans localStorage.
       const result = await loginUser(email, password, role);
-      console.log('Login success:', result);
+      console.log('Login successful:', result);
 
-      // Store access_token in localStorage or cookie
-      localStorage.setItem('access_token', result.access_token);
-      localStorage.setItem('role', result.user.role); // candidate or recruiter
-
-
-
-      // Redirect to dashboard
+      // Redirection vers le tableau de bord spécifique au rôle
       router.push(`/${role}/dashboard`);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err instanceof TypeError && err.message === "Failed to fetch") {
-          setError("Server is not available. Please try again later.");
+          setError("Le serveur n'est pas disponible. Veuillez réessayer plus tard.");
         } else {
-          setError(err.message || 'Something went wrong');
+          setError(err.message || 'Une erreur inattendue est survenue.');
         }
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[var(--primary-50)] to-[var(--primary-100)] flex items-center justify-center p-4">
@@ -79,7 +77,7 @@ export default function LoginPage() {
           }`}
         >
           <h2 className="text-2xl font-bold text-white">
-            {role === 'candidate' ? 'Candidate Login' : 'Recruiter Login'}
+            {role === 'candidate' ? 'Connexion Candidat' : 'Connexion Recruteur'}
           </h2>
         </div>
 
@@ -94,19 +92,16 @@ export default function LoginPage() {
 
           <AuthForm type="login" onSubmit={handleSubmit} role={role} />
 
-          
-
           <div className="mt-6 text-center text-[var(--neutral-600)]">
-            Don't have an account?{' '}
+            Vous n'avez pas de compte ?{' '}
             <a
               href="/register"
               className={`font-medium ${role === 'candidate'
-                                ? 'text-[var(--primary-600)] hover:text-[var(--primary-500)] '
-                                : 'text-[var(--secondary-600)] hover:text-[var(--secondary-500)] '
-                            }         
-                            transition-colors`}
+                                  ? 'text-[var(--primary-600)] hover:text-[var(--primary-500)] '
+                                  : 'text-[var(--secondary-600)] hover:text-[var(--secondary-500)] '
+                                } transition-colors`}
             >
-              Create one
+              Créez-en un
             </a>
           </div>
         </div>

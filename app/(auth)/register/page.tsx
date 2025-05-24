@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RoleToggle from '@/components/auth/RoleToggle';
 import AuthForm from '@/components/auth/AuthForm';
-import { isAuthenticated, registerUser } from '@/lib/api/auth';
+import { isAuthenticated, registerUser, getRole } from '@/lib/api/auth'; // Importez getRole
 import Loader from '@/components/ui/loader';
 
 export default function RegisterPage() {
@@ -16,50 +16,61 @@ export default function RegisterPage() {
   const router = useRouter(); 
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
-      if (isAuthenticated()) {
-        const r = localStorage.getItem('role');
-        if (r === 'candidate') router.push('/candidate/dashboard');
-        else if (r === 'recruiter') router.push('/recruiter/dashboard');
-      } else{
-        setLoading(false)
+    // Vérifie si l'utilisateur est déjà authentifié au chargement de la page
+    if (isAuthenticated()) {
+      const storedRole = getRole(); // Utilise la fonction getRole de lib/api/auth
+      if (storedRole === 'candidate') {
+        router.push('/candidate/dashboard');
+      } else if (storedRole === 'recruiter') {
+        router.push('/recruiter/dashboard');
+      } else {
+        // Si le rôle n'est pas clair, peut-être déconnecter ou rediriger vers une page neutre
+        setLoading(false);
       }
-      
-    }, [loading,router]);
-
+    } else {
+      setLoading(false); // Arrête le chargement si non authentifié
+    }
+  }, [router]); // Supprime `loading` des dépendances car il est mis à jour à l'intérieur
 
   if (loading) {
-    return <Loader role='candidate' />;
+    return <Loader role='candidate' />; // Vous pouvez ajuster le 'role' ici si nécessaire
   }
 
   const handleSubmit = async (
-      e: React.FormEvent,
-      email: string,
-      password: string
-    ) => {
-      e.preventDefault();
-      setError('');
+    e: React.FormEvent,
+    email: string,
+    password: string
+  ) => {
+    e.preventDefault();
+    setError('');
 
-      try {
-        console.log(`Registering as ${role} with:`, { email, password });
+    try {
+      console.log(`Registering as ${role} with:`, { email, password });
 
-        const result = await registerUser(email, password, role);
-        console.log('Registration success:', result);
+      // registerUser() gère désormais l'authentification avec Supabase
+      // et la synchronisation avec votre backend Flask,
+      // ainsi que le stockage des informations dans localStorage SI une session est retournée immédiatement.
+      const result = await registerUser(email, password, role);
+      console.log('Registration success:', result);
 
-        // Store access_token in localStorage or cookie
-        localStorage.setItem('access_token', result.access_token);
-        localStorage.setItem('role', result.user.role); // candidate or recruiter
-
-        // Redirect to the appropriate dashboard
+      // Si Supabase nécessite une confirmation par e-mail, 'result.session' sera null.
+      if (result.session) {
+        // Redirection vers le tableau de bord si une session est immédiatement disponible
         router.push(`/${role}/dashboard`);
-      } catch (err: any) {
-        if (err instanceof TypeError && err.message === "Failed to fetch") {
-          setError("Server is not available. Please try again later.");
-        } else {
-          setError(err.message || "Registration failed");
-        }
+      } else {
+        // Si une confirmation par e-mail est nécessaire, affichez un message à l'utilisateur
+        setError(result.message || "Inscription réussie ! Veuillez vérifier votre e-mail pour confirmer votre compte.");
+        // Vous pouvez aussi rediriger vers une page "vérifier votre e-mail"
+        // router.push('/verify-email');
       }
+    } catch (err: any) {
+      if (err instanceof TypeError && err.message === "Failed to fetch") {
+        setError("Le serveur n'est pas disponible. Veuillez réessayer plus tard.");
+      } else {
+        setError(err.message || "L'inscription a échoué");
+      }
+    }
   };
 
   return (
@@ -74,7 +85,7 @@ export default function RegisterPage() {
           }`}
         >
           <h2 className="text-2xl font-bold text-white">
-            {role === 'candidate' ? 'Candidate Login' : 'Recruiter Login'}
+            {role === 'candidate' ? 'Inscription Candidat' : 'Inscription Recruteur'}
           </h2>
         </div>
 
@@ -90,21 +101,19 @@ export default function RegisterPage() {
           <AuthForm type="register" onSubmit={handleSubmit} role={role} />
 
           <div className="mt-6 text-center text-neutral-600">
-            Already have an account?{' '}
+            Vous avez déjà un compte ?{' '}
             <a 
               href="/login" 
               className={`font-medium ${role === 'candidate'
-                                ? 'text-[var(--primary-600)] hover:text-[var(--primary-500)] '
-                                : 'text-[var(--secondary-600)] hover:text-[var(--secondary-500)] '
-                            }         
-                            transition-colors`}
+                                  ? 'text-[var(--primary-600)] hover:text-[var(--primary-500)] '
+                                  : 'text-[var(--secondary-600)] hover:text-[var(--secondary-500)] '
+                                } transition-colors`}
             >
-              Sign in
+              Connectez-vous
             </a>
           </div>
         </div>
       </div>
     </div>
   );
-
 }
