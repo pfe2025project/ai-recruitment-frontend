@@ -24,7 +24,7 @@ export default function CandidateDashboard() {
   return (
     <div className="text-center text-2xl mt-10">
       <p>Welcome to your dashboard!</p>
-
+{/* 
       <div className="mt-6">
         <strong>Your token:</strong>
         <pre className="break-all bg-gray-100 p-4 rounded max-w-xl mx-auto mt-2">
@@ -37,7 +37,7 @@ export default function CandidateDashboard() {
         className="mt-6 px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
       >
         Logout
-      </button>
+      </button> */}
     </div>
   );
 }

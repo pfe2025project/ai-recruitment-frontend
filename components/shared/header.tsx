@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getCurrentUser, logout } from '@/lib/api/auth';
 import { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 const Header: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,6 +34,7 @@ const Header: React.FC = () => {
   const getNeutralColor = (shade: number) => `var(--neutral-${shade})`;
   const getSecondaryColor = (shade: number) => `var(--secondary-${shade})`;
 
+  const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -54,6 +56,8 @@ const Header: React.FC = () => {
     logout();
     setUser(null);
     setShowDropdown(false);
+    router.push('/login');
+
   };
 
   const getUserDisplayName = () => {
@@ -138,7 +142,7 @@ const Header: React.FC = () => {
               <>
                 <li>
                   <Link
-                    href="/offers"
+                    href="/candidate/jobs"
                     className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
                     style={{
                       color: getNeutralColor(600),
@@ -329,7 +333,7 @@ const Header: React.FC = () => {
                   {/* Part 3: Menu Items */}
                   <div className="py-1">
                     <Link
-                      href="/profile"
+                      href={`/${getUserRole()}/profile`}
                       className="block px-4 py-2 text-sm hover:bg-neutral-100"
                       style={{ color: getNeutralColor(700) }}
                       onClick={() => setShowDropdown(false)}

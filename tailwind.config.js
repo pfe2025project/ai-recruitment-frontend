@@ -1,16 +1,18 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-// tailwind.config.js
-const defaultTheme = require('tailwindcss/defaultTheme');
+// tailwind.config.ts
+// @ts-check
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const config = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       colors: {
+        // Définition des couleurs primaires et secondaires comme variables CSS
+        // Cela permet de les utiliser à la fois via les classes Tailwind et en ligne
         primary: {
           50: 'var(--primary-50)',
           100: 'var(--primary-100)',
@@ -35,7 +37,7 @@ module.exports = {
           800: 'var(--secondary-800)',
           900: 'var(--secondary-900)',
         },
-        neutral: {
+        neutral: { // Si vous avez aussi des couleurs neutres basées sur des variables
           50: 'var(--neutral-50)',
           100: 'var(--neutral-100)',
           200: 'var(--neutral-200)',
@@ -46,16 +48,16 @@ module.exports = {
           700: 'var(--neutral-700)',
           800: 'var(--neutral-800)',
           900: 'var(--neutral-900)',
-        },
-        success: 'var(--success)',
-        error: 'var(--error)',
-        warning: 'var(--warning)',
-        info: 'var(--info)',
+        }
       },
-      fontFamily: {
-        sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },
-  plugins: [],
 };
+
+module.exports = config;
+export default config;

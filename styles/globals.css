@@ -81,3 +81,20 @@ body {
   color: var(--foreground);
   @apply font-sans; /* Use Tailwind's font system */
 }
+
+
+
+/* globals.css */
+@layer components {
+  .btn-primary {
+    background-color: var(--primary-600);
+  }
+
+  .btn-primary:hover {
+      background-color: var(--primary-700);
+  }
+
+  .btn-close {
+
+  }
+}

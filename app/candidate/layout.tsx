@@ -1,38 +1,59 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Loader from '@/components/ui/loader';
 import { useRouter } from 'next/navigation';
 import { getAccessToken, getRole } from '@/lib/api/auth';
+import Loader from '@/components/ui/loader'; // Assurez-vous que ce composant existe
+import Header from '@/components/shared/header'; // Importez votre composant Header
+import Footer from '@/components/shared/footer'; // Importez votre composant Footer
 
 export default function CandidateLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false); // Nouveau state pour suivre l'autorisation
 
-  
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-    const userRole = getRole(); // ex: "candidate", "recruiter"
-    if (userRole !== 'candidate') {
-      router.push('/unauthorized'); // ou afficher message accès refusé
-      return;
-    }
-    
-    setLoading(false);
+    const checkAuth = async () => {
+      const token = getAccessToken();
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+      
+      const userRole = getRole();
+      if (userRole !== 'candidate') {
+        router.push('/unauthorized'); // Ou une page d'erreur spécifique
+        return;
+      }
+      
+      // Optionnel: Vous pourriez ajouter une vérification de token valide ici
+      // en appelant une API backend si nécessaire.
+      
+      setAuthorized(true);
+      setLoading(false);
+    };
+
+    checkAuth();
   }, [router]);
 
   if (loading) {
-    return <Loader role='candidate' />;
+    // Affiche un loader tant que la vérification d'authentification est en cours
+    return <Loader role="candidate" />;
   }
 
+  // Si non autorisé (redirigé, mais peut aussi être un état transitoire avant redirection)
+  if (!authorized) {
+    return null; // Ou un message d'erreur si vous préférez ne pas rediriger immédiatement
+  }
+
+  // Si autorisé, affiche le contenu avec le header et le footer
   return (
-    <div>
-      {/* Navbar candidate, sidebar, etc */}
-      {children}
+    <div className="min-h-screen flex flex-col">
+      <Header /> {/* Votre Header pour le layout candidat */}
+      <main className="flex-grow">
+        {children} {/* Les pages (profile/page.tsx, profile/edit/page.tsx, etc.) */}
+      </main>
+      <Footer /> {/* Votre Footer pour le layout candidat */}
     </div>
   );
 }

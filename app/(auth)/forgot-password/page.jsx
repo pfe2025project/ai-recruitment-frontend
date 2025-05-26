@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
 
       if (error) throw error;
 
-      setMessage('Password reset link sent to your email!');
+      setMessage('Un lien de réinitialisation a été envoyé à votre adresse e-mail !');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,34 +36,34 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--primary-50)] to-white flex items-center justify-center">
+    <div className="min-h-screen  flex items-center justify-center">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
         
-        {/* Left side - illustration or welcome */}
+        {/* Côté gauche - illustration ou message d'accueil */}
         <div className="hidden md:flex flex-col items-center justify-center bg-[var(--primary-600)] text-white p-8">
-          <h2 className="text-3xl font-bold mb-2">Forgot Your Password?</h2>
+          <h2 className="text-3xl font-bold mb-2">Mot de passe oublié ?</h2>
           <p className="text-lg text-[var(--primary-100)] text-center">
-            Don’t worry — it happens! Enter your email and we’ll send you a link to reset your password.
+            Ne vous inquiétez pas — ça arrive ! Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.
           </p>
           <Image
             src="/favicon.ico"
-            alt="App Logo"
+            alt="Logo de l'application"
             width={64}
             height={64}
             className="mt-8 rounded-lg"
           />
         </div>
 
-        {/* Right side - form */}
+        {/* Côté droit - formulaire */}
         <div className="p-8">
           <div className="mb-6 text-center">
-            <Image src="/favicon.ico" alt="App Logo" width={48} height={48} className="mx-auto" />
-            <h1 className="text-2xl font-bold mt-4">Reset Your Password</h1>
+            <Image src="/favicon.ico" alt="Logo de l'application" width={48} height={48} className="mx-auto" />
+            <h1 className="text-2xl font-bold mt-4">Réinitialisez votre mot de passe</h1>
           </div>
 
           {message && (
             <div className="mb-4 p-3 bg-green-100 text-green-700 rounded text-sm">
-              {message}. <Link href="/login" className="underline text-green-800 font-medium">Back to login</Link>
+              {message}. <Link href="/login" className="underline text-green-800 font-medium">Retour à la connexion</Link>
             </div>
           )}
 
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
+                Adresse e-mail
                 </label>
                 <input
                 id="email"
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[var(--primary-500)] focus:border-[var(--primary-500)] bg-[var(--primary-50)] text-gray-800"
-                placeholder="Enter your email"
+                placeholder="Entrez votre adresse e-mail"
                 />
             </div>
 
@@ -119,17 +119,15 @@ export default function ForgotPasswordPage() {
                     ></path>
                 </svg>
                 ) : (
-                'Reset Password'
+                'Réinitialiser le mot de passe'
                 )}
             </button>
           </form>
 
-
-
           <p className="mt-6 text-sm text-center text-gray-600">
-            Remembered your password?{' '}
+            Vous vous souvenez de votre mot de passe ?{' '}
             <Link href="/login" className="text-[var(--primary-600)] hover:underline font-medium">
-              Go back to Login
+              Retour à la connexion
             </Link>
           </p>
         </div>
