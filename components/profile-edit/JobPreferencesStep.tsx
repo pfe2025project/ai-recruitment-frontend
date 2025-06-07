@@ -4,7 +4,7 @@ import StepWrapper from './StepWrapper';
 import Input from '@/components/ui/Input';
 import Checkbox from '@/components/ui/Checkbox';
 import Select from '@/components/ui/Select';
-import { JobPreferences } from '@/data/dummyProfileData';
+import { JobPreferences } from '@/data/defaultProfileData';
 
 interface JobPreferencesStepProps {
   jobPreferences: JobPreferences;

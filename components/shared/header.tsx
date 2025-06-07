@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getCurrentUser, logout } from '@/lib/api/auth';
+import {  getCurrentUser, getSupabaseAccessToken, logout } from '@/lib/api/auth';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
@@ -40,7 +40,16 @@ const Header: React.FC = () => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        console.log(currentUser);
+        if (currentUser) {
+          console.log("uid ",currentUser.id);
+        }
+
+        const token = await getSupabaseAccessToken();
+        if (token) {
+          console.log("Access Token:", token);
+          // Tu peux maintenant l'utiliser dans un appel API avec:
+          // Authorization: Bearer ${token}
+        }
       } catch (error) {
         console.error("Erreur lors de la récupération de l'utilisateur :", error);
         setUser(null);
@@ -56,7 +65,7 @@ const Header: React.FC = () => {
     logout();
     setUser(null);
     setShowDropdown(false);
-    router.push('/login');
+    router.push('/');
 
   };
 
@@ -77,7 +86,7 @@ const Header: React.FC = () => {
   const isCandidate = getUserRole() === 'candidate';
 
   return (
-    <header style={{ backgroundColor: getNeutralColor(50) }} className="shadow-md py-4">
+    <header style={{ backgroundColor: "white" }} className="shadow-md py-4">
       <div className="container mx-auto px-6 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
@@ -163,7 +172,7 @@ const Header: React.FC = () => {
                 </li>
                 <li>
                   <Link
-                    href="/dashboard"
+                    href={`/${getUserRole()}/dashboard`}
                     className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
                     style={{
                       color: getNeutralColor(600),
@@ -343,7 +352,7 @@ const Header: React.FC = () => {
 
                     {isCandidate && (
                       <Link
-                        href="/offers-applied"
+                        href="/candidate/my-applications"
                         className="block px-4 py-2 text-sm hover:bg-neutral-100"
                         style={{ color: getNeutralColor(700) }}
                         onClick={() => setShowDropdown(false)}

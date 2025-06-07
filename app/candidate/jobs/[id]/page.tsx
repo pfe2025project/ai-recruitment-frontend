@@ -1,17 +1,17 @@
 /* eslint-disable react/no-unescaped-entities */
 // app/jobs/[id]/page.tsx
-'use client'; // This page uses client-side interactivity
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import { MdWork, MdLocationOn, MdCalendarToday, MdAccessTime } from 'react-icons/md';
-import { FaMoneyBillAlt, FaArrowLeft, FaCheckCircle,  FaBookmark, FaRegBookmark } from 'react-icons/fa';
-import { IoDiamondOutline } from 'react-icons/io5'; // For score icon
-
+import { FaMoneyBillAlt, FaArrowLeft, FaCheckCircle, FaBookmark, FaRegBookmark } from 'react-icons/fa';
+import { IoDiamondOutline } from 'react-icons/io5';
 
 import { dummyJobs } from '@/data/dummyJobs'; // Adjust path if you move it
+import { dummyProfileData, UserCV } from '@/data/dummyProfileData2'; // Import dummyProfileData and UserCV
 
 // Ensure this interface matches the extended dummyJobs structure
 interface Job {
@@ -37,6 +37,9 @@ interface Job {
   matchScore?: number;
 }
 
+// Import the new ApplyModal component
+import ApplyModal from '@/components/application/ApplyModal';
+
 const JobDetailPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
@@ -45,6 +48,10 @@ const JobDetailPage: React.FC = () => {
   const [job, setJob] = useState<Job | null>(null);
   const [isApplied, setIsApplied] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false); // State for modal visibility
+
+  // Simulate fetching candidate's CVs (from dummyProfileData for now)
+  const [userCvs, setUserCvs] = useState<UserCV[]>([]);
 
   useEffect(() => {
     // In a real app, you'd fetch data from an API:
@@ -62,14 +69,29 @@ const JobDetailPage: React.FC = () => {
       // Handle job not found (e.g., redirect to 404 or jobs list)
       router.push('/jobs'); // Redirect back to jobs list
     }
+
+    // Simulate fetching user's CVs
+    setUserCvs(dummyProfileData.userCvs);
+
   }, [jobId, router]); // Re-run if jobId changes
 
-  const handleApply = () => {
+  const handleApplyClick = () => {
+    setIsApplyModalOpen(true); // Open the modal
+  };
+
+  const handleConfirmApplication = (jobId: string, selectedCv: File | UserCV, coverLetter: string) => {
     // In a real app, send application request to backend
-    // On success, update hasApplied state
-    setIsApplied(true);
-    alert('Félicitations ! Vous avez postulé à cette offre.');
-    // Optional: Update dummy data or backend
+    console.log(`Applying to Job ID: ${jobId}`);
+    console.log('Selected CV:', selectedCv);
+    console.log('Cover Letter:', coverLetter);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsApplied(true);
+      alert('Félicitations ! Votre candidature a été soumise avec succès.');
+      // Optional: Update dummy data or backend, e.g., mark job as applied for this user
+      // For this demo, we just update local state
+    }, 1000);
   };
 
   const handleToggleSave = () => {
@@ -99,7 +121,7 @@ const JobDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
-      <div className="container mx-auto px-6 max-w-4xl">
+      <div className="container mx-auto px-6 ">
         {/* Back Button */}
         <button
           onClick={() => router.back()}
@@ -135,7 +157,7 @@ const JobDetailPage: React.FC = () => {
               title={isSaved ? "Ne plus sauvegarder" : "Sauvegarder l'offre"}
             >
             {isSaved ? (
-            <FaBookmark size={20} className="text-indigo-500 cursor-pointer"  />
+            <FaBookmark size={20} className="text-indigo-500 cursor-pointer" />
             ) : (
             <FaRegBookmark size={20} className="text-neutral-400 cursor-pointer group-hover:text-neutral-600" />
             )}
@@ -179,7 +201,7 @@ const JobDetailPage: React.FC = () => {
           {/* Apply Button & Status */}
           <div className="mt-8 flex justify-end">
             <Button
-              onClick={handleApply}
+              onClick={handleApplyClick} 
               variant={isApplied ? 'secondary' : 'primary'}
               disabled={isApplied}
               className="py-3 px-8 text-lg cursor-pointer"
@@ -267,6 +289,17 @@ const JobDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Apply Modal */}
+      {job && ( // Render modal only if job data is loaded
+        <ApplyModal
+          isOpen={isApplyModalOpen}
+          onClose={() => setIsApplyModalOpen(false)}
+          job={job}
+          userCvs={userCvs} // Pass the candidate's CVs
+          onApply={handleConfirmApplication}
+        />
+      )}
     </div>
   );
 };

@@ -6,7 +6,7 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
 import { FaPlus, FaTrash } from 'react-icons/fa';
-import { Experience } from '@/data/dummyProfileData';
+import { Experience } from '@/data/defaultProfileData';
 
 interface ExperienceStepProps {
   experiences: Experience[];

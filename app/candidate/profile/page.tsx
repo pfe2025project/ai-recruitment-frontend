@@ -26,19 +26,7 @@ import AwardIcon from '@/components/icons/AwardIcon';
 import { MdHelpOutline } from 'react-icons/md';
 
 // Import the dummy profile data
-import { dummyProfileData, ProfileData } from '@/data/dummyProfileData';
-
-// Import the MultiStepFormModal
-import MultiStepFormModal from '@/components/ui/MultiStepFormModal';
-import CVUploadStep from '@/components/profile-edit/CVUploadStep';
-import BasicInfoStep from '@/components/profile-edit/BasicInfoStep';
-import AboutStep from '@/components/profile-edit/AboutStep';
-import EducationStep from '@/components/profile-edit/EducationStep';
-import ExperienceStep from '@/components/profile-edit/ExperienceStep';
-import SkillsStep from '@/components/profile-edit/SkillsStep';
-import CertificationsStep from '@/components/profile-edit/CertificationsStep';
-import OtherInfoStep from '@/components/profile-edit/OtherInfoStep';
-import JobPreferencesStep from '@/components/profile-edit/JobPreferencesStep';
+import { dummyProfileData, ProfileData } from '@/data/dummyProfileData2';
 
 
 const ProfilePage: React.FC = () => {
@@ -81,8 +69,7 @@ const ProfilePage: React.FC = () => {
 
   const handleEditProfile = () => {
     // When opening the modal, set the current data to the form's state
-    setProfileData(liveProfileData);
-    setIsEditModalOpen(true);
+    router.push('/candidate/profile/edit')
   };
 
   const handleUploadCV = () => {
@@ -113,110 +100,7 @@ const ProfilePage: React.FC = () => {
     return skills;
   };
 
-  const steps = [
-    {
-      id: 'cv-upload',
-      name: 'Télécharger le CV',
-      component: (
-        <CVUploadStep
-          onCVUpload={(file) => handleProfileDataChange('cvFile', file)}
-          existingCvUrl={liveProfileData.cvPdfUrl || null}
-          onExtractSkills={simulateCVExtraction}
-        />
-      ),
-      optional: false, // CV upload is mandatory for new users, but can be skipped if profile exists
-    },
-    {
-      id: 'basic-info',
-      name: 'Infos de base',
-      component: (
-        <BasicInfoStep
-          profileData={profileData}
-          onChange={handleProfileDataChange}
-          onContactChange={handleContactInfoChange}
-        />
-      ),
-      optional: false,
-    },
-    {
-      id: 'about',
-      name: 'À propos',
-      component: (
-        <AboutStep
-          profileData={profileData}
-          onChange={handleProfileDataChange}
-        />
-      ),
-      optional: true,
-    },
-    {
-      id: 'education',
-      name: 'Formation',
-      component: (
-        <EducationStep
-          education={profileData.education}
-          onChange={(newEducation) => handleProfileDataChange('education', newEducation)}
-        />
-      ),
-      optional: true,
-    },
-    {
-      id: 'experience',
-      name: 'Expériences',
-      component: (
-        <ExperienceStep
-          experiences={profileData.experiences}
-          onChange={(newExperiences) => handleProfileDataChange('experiences', newExperiences)}
-        />
-      ),
-      optional: true,
-    },
-    {
-      id: 'skills',
-      name: 'Compétences',
-      component: (
-        <SkillsStep
-          profileData={profileData}
-          onChange={(field, value) => handleProfileDataChange(field, value as string[])}
-          extractedSkills={extractedSkills}
-        />
-      ),
-      optional: true,
-    },
-    {
-      id: 'certifications',
-      name: 'Certifications',
-      component: (
-        <CertificationsStep
-          certifications={profileData.certifications}
-          onChange={(newCertifications) => handleProfileDataChange('certifications', newCertifications)}
-        />
-      ),
-      optional: true,
-    },
-    {
-      id: 'job-preferences',
-      name: 'Préférences d\'emploi',
-      component: (
-        <JobPreferencesStep
-          jobPreferences={profileData.jobPreferences}
-          onChange={handleJobPreferencesChange}
-        />
-      ),
-      optional: true,
-    },
-    {
-      id: 'other-info',
-      name: 'Autres infos',
-      component: (
-        <OtherInfoStep
-          profileData={profileData}
-          onContactChange={handleContactInfoChange}
-        />
-      ),
-      optional: true,
-    },
-  ];
+
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
@@ -322,14 +206,7 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Multi-Step Profile Edit Modal */}
-      <MultiStepFormModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        steps={steps}
-        onSave={handleSaveProfile}
-        initialStepIndex={liveProfileData.cvPdfUrl ? 1 : 0} // Start at Basic Info if CV exists, else CV Upload
-      />
+      
     </div>
   );
 };

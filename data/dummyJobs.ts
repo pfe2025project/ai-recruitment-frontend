@@ -1,204 +1,344 @@
-// data/dummyJobs.ts
-// (Copy the dummyJobs array and the Job interface from app/jobs/page.tsx here)
+// data/dummyJobs.ts (updated)
 
 export interface Job {
-    id: string;
-    title: string;
-    company: string;
-    location: string;
-    postedDate: string;
-    contractType: string;
-    workMode: string;
-    sector: string;
-    description: string;
-    imageUrl?: string;
-    salary?: string;
-    skills?: string[];
-    requirements?: {
-      diploma?: string[];
-      experience?: string;
-      languages?: string[];
-      other?: string[];
-    };
-    hasApplied?: boolean;
-    matchScore?: number;
-  }
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  postedDate: string;
+  contractType: string;
+  workMode: string;
+  sector: string;
+  description: string;
+  imageUrl?: string;
+  salary?: string;
+  skills?: string[];
+  requirements?: {
+    diploma?: string[];
+    experience?: string;
+    languages?: string[];
+    other?: string[];
+  };
+  hasApplied?: boolean; // Keep this for immediate feedback on job detail page
+  matchScore?: number;
+  // NEW: Application status and date
+  applicationStatus?: 'en attente' | 'retenu' | 'rejeté' | 'entretien prévu';
+  applicationDate?: string; // Date when the candidate applied
+}
 
-  export const dummyJobs: Job[] = [
-    {
-      id: '1',
-      title: 'Développeur Frontend React Senior',
-      company: 'Tech Solutions Inc.',
-      location: 'Paris, France (Remote possible)',
-      postedDate: '2024-05-20',
-      contractType: 'CDI',
-      workMode: 'Remote',
-      sector: 'IT',
-      description: "Rejoignez notre équipe dynamique pour construire des interfaces utilisateur de nouvelle génération avec React et TypeScript. Vous serez responsable du développement de composants UI réutilisables, de l'intégration avec les API backend et de l'optimisation des performances des applications web. Nous recherchons un profil autonome, capable de prendre des initiatives et de contribuer activement à l'amélioration de nos pratiques de développement. Vous travaillerez en étroite collaboration avec les équipes produit et design pour livrer des expériences utilisateur exceptionnelles.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1055/1055666.png',
-      salary: '60 000 - 75 000 € / an',
-      skills: ['React.js', 'TypeScript', 'Redux', 'Jest', 'GraphQL', 'Webpack', 'Figma', 'Agile', 'UX/UI', 'Git'],
-      requirements: {
-        diploma: ['Bac+5 Informatique', 'École d\'ingénieur'],
-        experience: '5 ans et plus sur un poste similaire',
-        languages: ['Français', 'Anglais (professionnel)'],
-        other: ['Excellentes compétences en résolution de problèmes', 'Capacité à travailler en équipe', 'Passion pour les nouvelles technologies']
-      },
-      hasApplied: false,
-      matchScore: 85,
+export const dummyJobs: Job[] = [
+  {
+    id: '1',
+    title: 'Développeur Fullstack React/Node.js',
+    company: 'Tech Solutions Inc.',
+    location: 'Paris, France',
+    postedDate: '2025-05-20',
+    contractType: 'CDI',
+    workMode: 'Hybride',
+    sector: 'Informatique',
+    description: `Nous recherchons un développeur Fullstack expérimenté pour rejoindre notre équipe dynamique. Vous travaillerez sur des projets innovants, du front-end au back-end, en utilisant React.js et Node.js.
+    
+    Responsabilités :
+    - Développer et maintenir des applications web robustes.
+    - Collaborer avec les équipes produit et design.
+    - Assurer la qualité du code et les tests unitaires.
+    - Participer aux revues de code.
+    
+    Compétences techniques:
+    - Maîtrise de JavaScript/TypeScript, React, Node.js.
+    - Connaissance des bases de données SQL et NoSQL.
+    - Expérience avec les APIs RESTful.
+    - Familiarité avec les principes Agile/Scrum.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/FF5733/FFFFFF?text=TS', // Example image
+    salary: '45k-60k€',
+    skills: ['React.js', 'Node.js', 'TypeScript', 'MongoDB', 'GraphQL', 'AWS'],
+    requirements: {
+      diploma: ['Bac+5 Informatique'],
+      experience: '3-5 ans',
+      languages: ['Anglais (courant)'],
+      other: ['Esprit d\'équipe', 'Autonome'],
     },
-    {
-      id: '2',
-      title: 'Chef de Projet Digital',
-      company: 'Creative Minds Agency',
-      location: 'Lyon, France',
-      postedDate: '2024-05-18',
-      contractType: 'CDI',
-      workMode: 'Hybrid',
-      sector: 'Marketing',
-      description: "Nous recherchons un chef de projet expérimenté pour gérer des projets web et marketing de A à Z. Vous serez le point central entre les clients et les équipes internes, assurant la livraison des projets dans les délais et budgets impartis. Votre rôle inclura la planification, l'exécution, le suivi et la clôture des projets, ainsi que la gestion des relations avec les parties prenantes.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1458/1458512.png',
-      salary: '45 000 - 55 000 € / an',
-      skills: ['Gestion de projet', 'Scrum', 'SEO', 'SEA', 'Google Analytics', 'Communication', 'Wordpress', 'Jira', 'Reporting'],
-      requirements: {
-        diploma: ['Bac+3/5 Marketing', 'École de commerce'],
-        experience: '3 ans minimum en gestion de projet digital',
-        languages: ['Français', 'Anglais (bon niveau)'],
-        other: ['Excellentes capacités organisationnelles', 'Orientation client', 'Leadership']
-      },
-      hasApplied: true,
-      matchScore: 70,
+    hasApplied: true, // Mark as applied
+    applicationStatus: 'entretien prévu', // Example status
+    applicationDate: '2025-05-22', // Example date
+    matchScore: 85,
+  },
+  {
+    id: '2',
+    title: 'Chef de Projet Digital',
+    company: 'Marketing Innovators',
+    location: 'Lyon, France',
+    postedDate: '2025-05-18',
+    contractType: 'CDI',
+    workMode: 'Présentiel',
+    sector: 'Marketing',
+    description: `En tant que Chef de Projet Digital, vous serez responsable de la gestion de projets web de A à Z, de la conception à la livraison. Vous travaillerez en étroite collaboration avec les clients et les équipes internes.
+    
+    Vos missions :
+    - Définir les besoins clients et rédiger les spécifications.
+    - Planifier et suivre les projets.
+    - Gérer les budgets et les délais.
+    - Coordonner les équipes techniques et créatives.
+    - Assurer la satisfaction client.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/33A2FF/FFFFFF?text=MI',
+    salary: '40k-55k€',
+    skills: ['Gestion de projet', 'SCRUM', 'Marketing Digital', 'SEO', 'SEA'],
+    requirements: {
+      diploma: ['Bac+4/5 Marketing', 'École de commerce'],
+      experience: '2-4 ans',
+      languages: ['Anglais'],
+      other: ['Excellente communication', 'Organisation'],
     },
-    {
-      id: '3',
-      title: 'Data Scientist Junior',
-      company: 'Data Insights Corp.',
-      location: 'Bordeaux, France',
-      postedDate: '2024-05-15',
-      contractType: 'CDD',
-      workMode: 'On site',
-      sector: 'Data',
-      description: "Opportunité pour un Data Scientist junior passionné par l'analyse de données et le machine learning. Vous travaillerez sur l'extraction, la transformation et l'analyse de grands volumes de données pour en tirer des insights précieux. Vous contribuerez à la modélisation prédictive et à l'amélioration des processus décisionnels basés sur les données.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1055/1055644.png',
-      salary: '35 000 - 40 000 € / an',
-      skills: ['Python', 'R', 'SQL', 'Machine Learning', 'Statistiques', 'Tableau', 'Power BI', 'Modélisation'],
-      requirements: {
-        diploma: ['Bac+5 en Statistiques', 'Mathématiques appliquées', 'Informatique'],
-        experience: 'Débutant ou 1 an d\'expérience',
-        languages: ['Français'],
-        other: ['Rigueur analytique', 'Curiosité', 'Proactivité']
-      },
-      hasApplied: false,
-      matchScore: 60,
+    hasApplied: true, // Mark as applied
+    applicationStatus: 'en attente', // Example status
+    applicationDate: '2025-05-20', // Example date
+    matchScore: 70,
+  },
+  {
+    id: '3',
+    title: 'Designer UI/UX Senior',
+    company: 'Creative Studio',
+    location: 'Bordeaux, France',
+    postedDate: '2025-05-15',
+    contractType: 'CDI',
+    workMode: 'Full Remote',
+    sector: 'Design',
+    description: `Nous recherchons un Designer UI/UX passionné pour concevoir des expériences utilisateur exceptionnelles. Vous serez en charge de l'ensemble du processus de conception, de la recherche utilisateur à la livraison des maquettes finales.
+    
+    Ce que nous attendons :
+    - Concevoir des interfaces intuitives et esthétiques.
+    - Réaliser des wireframes, mockups et prototypes.
+    - Effectuer des tests utilisateurs et des analyses.
+    - Travailler en synergie avec les développeurs.
+    
+    Outils maîtrisés :
+    - Figma, Sketch, Adobe XD.
+    - Suite Adobe (Photoshop, Illustrator).
+    - Prototypage interactif.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/FF33A8/FFFFFF?text=CS',
+    salary: '42k-58k€',
+    skills: ['UI/UX Design', 'Figma', 'Prototypage', 'Design System', 'User Research'],
+    requirements: {
+      diploma: ['Bac+3/5 Design Graphique', 'UX Design'],
+      experience: '5 ans et plus',
+      languages: [],
+      other: ['Créativité', 'Souci du détail'],
     },
-    {
-      id: '4',
-      title: 'Designer UX/UI',
-      company: 'Innovate Design Studio',
-      location: 'Remote',
-      postedDate: '2024-05-10',
-      contractType: 'Freelance',
-      workMode: 'Remote',
-      sector: 'Design',
-      description: "Nous recherchons un designer UX/UI talentueux pour concevoir des expériences utilisateur intuitives et esthétiques. Vous serez impliqué dans toutes les phases du processus de conception, de la recherche utilisateur à la création de prototypes interactifs. Votre mission sera de transformer des idées complexes en interfaces simples et agréables à utiliser.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1458/1458564.png',
-      salary: '500 - 700 € / jour',
-      skills: ['Figma', 'Sketch', 'Adobe XD', 'User Research', 'Prototyping', 'Design System', 'Accessibilité', 'Wireframing'],
-      requirements: {
-        diploma: ['Bac+3/5 Design UX/UI', 'Graphisme'],
-        experience: '2 ans minimum en UX/UI',
-        languages: ['Français', 'Anglais (lu/écrit)'],
-        other: ['Créativité', 'Empathie utilisateur', 'Bonne communication']
-      },
-      hasApplied: false,
-      matchScore: 78,
+    hasApplied: false, // Not applied yet
+    matchScore: 90,
+  },
+  {
+    id: '4',
+    title: 'Ingénieur DevOps Cloud (AWS)',
+    company: 'Cloud Innovations',
+    location: 'Nantes, France',
+    postedDate: '2025-05-12',
+    contractType: 'CDI',
+    workMode: 'Hybride',
+    sector: 'Cloud Computing',
+    description: `Rejoignez notre équipe en tant qu'Ingénieur DevOps Cloud pour construire et maintenir des infrastructures scalables et fiables sur AWS.
+    
+    Vos responsabilités incluront :
+    - Déploiement et gestion d'infrastructures cloud.
+    - Automatisation des processus (CI/CD).
+    - Monitoring et optimisation des performances.
+    - Sécurité des systèmes.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/33FF57/FFFFFF?text=CI',
+    salary: '50k-70k€',
+    skills: ['AWS', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD', 'Python'],
+    requirements: {
+      diploma: ['Bac+5 Ingénieur', 'Informatique'],
+      experience: '4 ans et plus',
+      languages: ['Anglais (technique)'],
+      other: ['Résolution de problèmes', 'Travail en équipe'],
     },
-    {
-      id: '5',
-      title: 'Ingénieur DevOps',
-      company: 'Cloud Native Solutions',
-      location: 'Nantes, France',
-      postedDate: '2024-05-08',
-      contractType: 'CDI',
-      workMode: 'On site',
-      sector: 'IT',
-      description: "Poste d'Ingénieur DevOps pour optimiser nos infrastructures cloud et CI/CD. Vous travaillerez à l'automatisation des déploiements, à la gestion des conteneurs et à l'assurance de la stabilité des systèmes. Vous serez un acteur clé dans l'amélioration continue de notre environnement de développement et de production.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1055/1055675.png',
-      salary: '55 000 - 70 000 € / an',
-      skills: ['Docker', 'Kubernetes', 'AWS', 'Azure', 'CI/CD', 'Ansible', 'Terraform', 'Linux', 'Bash'],
-      requirements: {
-        diploma: ['Bac+5 Informatique', 'Ingénierie des systèmes'],
-        experience: '4 ans et plus en DevOps',
-        languages: ['Français', 'Anglais (professionnel)'],
-        other: ['Résolution de problèmes complexes', 'Autonomie', 'Veille technologique']
-      },
-      hasApplied: false,
-      matchScore: 90,
+    hasApplied: true, // Mark as applied
+    applicationStatus: 'retenu', // Example status
+    applicationDate: '2025-05-14', // Example date
+    matchScore: 78,
+  },
+  {
+    id: '5',
+    title: 'Responsable Commercial B2B',
+    company: 'Global Sales Corp.',
+    location: 'Marseille, France',
+    postedDate: '2025-05-10',
+    contractType: 'CDI',
+    workMode: 'Présentiel',
+    sector: 'Vente',
+    description: `Nous recherchons un Responsable Commercial B2B dynamique pour développer notre portefeuille clients et atteindre nos objectifs de vente.
+    
+    Missions principales :
+    - Prospection et acquisition de nouveaux clients.
+    - Négociation et closing des contrats.
+    - Fidélisation de la clientèle existante.
+    - Veille concurrentielle.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/A833FF/FFFFFF?text=GSC',
+    salary: '35k-50k€ + commissions',
+    skills: ['Négociation', 'Prospection', 'CRM', 'Développement commercial'],
+    requirements: {
+      diploma: ['Bac+3/5 Commercial', 'Vente'],
+      experience: '3 ans minimum',
+      languages: ['Anglais (professionnel)'],
+      other: ['Autonome', 'Orienté résultats', 'Excellent relationnel'],
     },
-    {
-      id: '6',
-      title: 'Commercial B2B',
-      company: 'Global Sales Group',
-      location: 'Marseille, France',
-      postedDate: '2024-05-05',
-      contractType: 'CDI',
-      workMode: 'On site',
-      sector: 'Commercial',
-      description: "Développez notre portefeuille clients dans le secteur B2B. Vous serez en charge de la prospection, de la négociation et du suivi de la relation client, contribuant directement à la croissance de l'entreprise. Votre objectif sera d'atteindre et dépasser les objectifs de vente fixés.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1458/1458514.png',
-      salary: '40 000 € / an + commissions',
-      skills: ['Prospection', 'Négociation', 'CRM', 'Salesforce', 'Business Development', 'Communication', 'Force de vente', 'Relation client'],
-      requirements: {
-        diploma: ['Bac+2/3 Commercial', 'Négociation'],
-        experience: '2 ans minimum en vente B2B',
-        languages: ['Français'],
-        other: ['Dynamisme', 'Capacité de persuasion', 'Sens du résultat']
-      },
-      hasApplied: false,
-      matchScore: 65,
+    hasApplied: true, // Mark as applied
+    applicationStatus: 'rejeté', // Example status
+    applicationDate: '2025-05-11', // Example date
+    matchScore: 60,
+  },
+  {
+    id: '6',
+    title: 'Data Scientist Junior',
+    company: 'Data Insights Co.',
+    location: 'Paris, France',
+    postedDate: '2025-05-08',
+    contractType: 'CDI',
+    workMode: 'Hybride',
+    sector: 'Data Science',
+    description: `Rejoignez notre équipe de Data Scientists pour transformer des données brutes en insights exploitables. Vous travaillerez sur l'analyse prédictive, la modélisation et la visualisation de données.
+    
+    Vos tâches :
+    - Collecte et nettoyage de données.
+    - Développement de modèles statistiques et de machine learning.
+    - Création de tableaux de bord.
+    - Présentation des résultats aux équipes métiers.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/FF3333/FFFFFF?text=DI',
+    salary: '38k-48k€',
+    skills: ['Python', 'R', 'SQL', 'Machine Learning', 'Statistiques', 'Tableau'],
+    requirements: {
+      diploma: ['Bac+5 Data Science', 'Statistiques', 'Mathématiques appliquées'],
+      experience: '0-2 ans',
+      languages: ['Anglais'],
+      other: ['Curiosité', 'Rigueur analytique'],
     },
-    {
-      id: '7',
-      title: 'Développeur Backend Node.js',
-      company: 'API Masters',
-      location: 'Toulouse, France',
-      postedDate: '2024-05-01',
-      contractType: 'CDI',
-      workMode: 'Hybrid',
-      sector: 'IT',
-      description: "Construisez des APIs robustes et scalables avec Node.js et Express. Vous participerez à la conception des architectures, à l'écriture de code de qualité et à l'intégration avec diverses bases de données. Vous aurez l'opportunité de travailler sur des projets innovants et d'impacter directement nos produits.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1055/1055655.png',
-      salary: '50 000 - 65 000 € / an',
-      skills: ['Node.js', 'Express.js', 'MongoDB', 'PostgreSQL', 'REST API', 'Authentication', 'Microservices', 'AWS Lambda'],
-      requirements: {
-        diploma: ['Bac+5 Informatique', 'Développement logiciel'],
-        experience: '3 ans et plus en Node.js',
-        languages: ['Français', 'Anglais (technique)'],
-        other: ['Bonne compréhension des principes SOLID', 'Autonomie', 'Curiosité']
-      },
-      hasApplied: false,
-      matchScore: 82,
+    hasApplied: true, // Mark as applied
+    applicationStatus: 'en attente', // Example status
+    applicationDate: '2025-05-09', // Example date
+    matchScore: 75,
+  },
+  {
+    id: '7',
+    title: 'Consultant en Cybersécurité',
+    company: 'SecureNet Solutions',
+    location: 'Sophia Antipolis, France',
+    postedDate: '2025-05-05',
+    contractType: 'CDI',
+    workMode: 'Présentiel',
+    sector: 'Cybersécurité',
+    description: `Nous recherchons un Consultant en Cybersécurité pour accompagner nos clients dans la protection de leurs systèmes d'information.
+    
+    Missions :
+    - Audit de sécurité.
+    - Recommandations et implémentation de solutions.
+    - Sensibilisation des équipes.
+    - Veille technologique.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/33FFB5/FFFFFF?text=SNS',
+    salary: '45k-65k€',
+    skills: ['Audit de sécurité', 'Pentesting', 'ISO 27001', 'Réseaux', 'Cryptographie'],
+    requirements: {
+      diploma: ['Bac+5 Cybersécurité', 'Ingénieur Réseaux & Sécurité'],
+      experience: '3 ans et plus',
+      languages: ['Anglais (impératif)'],
+      other: ['Ethique professionnelle', 'Esprit d\'analyse'],
     },
-    {
-      id: '8',
-      title: 'Assistant(e) Administratif(ve)',
-      company: 'Support Services SA',
-      location: 'Paris, France',
-      postedDate: '2024-04-28',
-      contractType: 'CDD',
-      workMode: 'On site',
-      sector: 'Administration',
-      description: "Support administratif général et gestion de bureau. Vous serez un pilier essentiel pour le bon fonctionnement quotidien de l'entreprise, gérant les plannings, la correspondance et l'organisation des événements. Une bonne maîtrise des outils bureautiques est indispensable.",
-      imageUrl: 'https://cdn-icons-png.flaticon.com/512/1458/1458535.png',
-      salary: '28 000 - 32 000 € / an',
-      skills: ['Microsoft Office', 'Gestion de planning', 'Communication', 'Organisation', 'Accueil', 'Classement', 'Rédaction'],
-      requirements: {
-        diploma: ['Bac+2 Assistant de gestion', 'Secrétariat'],
-        experience: '1 an minimum sur un poste similaire',
-        languages: ['Français'],
-        other: ['Rigueur', 'Discrétion', 'Sens du service']
-      },
-      hasApplied: false,
-      matchScore: 55,
+    hasApplied: false, // Not applied yet
+    matchScore: 80,
+  },
+  {
+    id: '8',
+    title: 'Développeur Mobile iOS/Android',
+    company: 'App Innovators',
+    location: 'Toulouse, France',
+    postedDate: '2025-05-02',
+    contractType: 'CDI',
+    workMode: 'Hybride',
+    sector: 'Développement Mobile',
+    description: `Développez des applications mobiles natives et hybrides pour nos clients variés.
+    
+    Profil recherché :
+    - Expérience avec Swift/Kotlin ou React Native/Flutter.
+    - Connaissance des APIs mobiles.
+    - Publication sur les stores (App Store, Google Play).
+    - Conception d'interfaces utilisateur mobiles.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/8D33FF/FFFFFF?text=AI',
+    salary: '40k-55k€',
+    skills: ['iOS', 'Android', 'Swift', 'Kotlin', 'React Native', 'Flutter', 'UI/UX Mobile'],
+    requirements: {
+      diploma: ['Bac+3/5 Informatique', 'Développement Mobile'],
+      experience: '2-4 ans',
+      languages: ['Anglais (technique)'],
+      other: ['Passion pour le mobile', 'Veille technologique'],
     },
-  ];
+    hasApplied: false, // Not applied yet
+    matchScore: 65,
+  },
+  {
+    id: '9',
+    title: 'Comptable Junior',
+    company: 'Expertise Comptable ABC',
+    location: 'Lille, France',
+    postedDate: '2025-04-28',
+    contractType: 'CDI',
+    workMode: 'Présentiel',
+    sector: 'Comptabilité',
+    description: `Rejoignez notre cabinet en tant que Comptable Junior et participez à la gestion quotidienne des dossiers clients.
+    
+    Vos missions :
+    - Saisie des opérations comptables.
+    - Rapprochements bancaires.
+    - Déclarations fiscales et sociales.
+    - Préparation des bilans.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/FF8833/FFFFFF?text=ECA',
+    salary: '28k-35k€',
+    skills: ['Comptabilité générale', 'Fiscalité', 'Pack Office', 'Sage', 'Ciel Compta'],
+    requirements: {
+      diploma: ['BTS Comptabilité', 'DCG'],
+      experience: '0-1 an',
+      languages: [],
+      other: ['Rigueur', 'Organisation', 'Esprit d\'équipe'],
+    },
+    hasApplied: true,
+    applicationStatus: 'en attente',
+    applicationDate: '2025-04-29',
+    matchScore: 50,
+  },
+  {
+    id: '10',
+    title: 'Assistant Marketing Communication',
+    company: 'Brand Builders Co.',
+    location: 'Strasbourg, France',
+    postedDate: '2025-04-25',
+    contractType: 'Alternance',
+    workMode: 'Hybride',
+    sector: 'Marketing',
+    description: `Nous offrons une opportunité en alternance pour un Assistant Marketing Communication.
+    
+    Missions :
+    - Participer à l'élaboration des campagnes marketing.
+    - Gérer les réseaux sociaux.
+    - Rédiger des contenus.
+    - Organiser des événements.
+    `,
+    imageUrl: 'https://via.placeholder.com/150/33CCFF/FFFFFF?text=BBC',
+    salary: 'Rémunération légale alternance',
+    skills: ['Marketing Digital', 'Réseaux Sociaux', 'Rédaction web', 'Pack Office', 'Canva'],
+    requirements: {
+      diploma: ['Bac+2/3 Marketing', 'Communication'],
+      experience: 'Stage significatif',
+      languages: ['Anglais'],
+      other: ['Créativité', 'Dynamisme'],
+    },
+    hasApplied: false,
+    matchScore: 72,
+  },
+];

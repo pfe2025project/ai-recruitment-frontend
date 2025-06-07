@@ -1,4 +1,4 @@
-// data/dummyProfileData.ts
+// data/dummyProfileData.ts (updated)
 
 export interface Experience {
   title: string;
@@ -18,7 +18,7 @@ export interface Education {
 
 export interface Skill {
   name: string;
-  isExtracted?: boolean; // To indicate if it was extracted from CV
+  isExtracted?: boolean;
 }
 
 export interface Language {
@@ -45,7 +45,15 @@ export interface ContactInfo {
   phone: string;
   linkedin?: string;
   website?: string;
-  github?: string; // Added GitHub
+  github?: string;
+}
+
+// New interface for a stored CV
+export interface UserCV {
+  id: string;
+  name: string; // e.g., "Mon CV Standard", "CV Développeur React"
+  url: string; // Path to the PDF
+  uploadedAt: string; // Date of upload
 }
 
 export interface ProfileData {
@@ -56,22 +64,22 @@ export interface ProfileData {
   about: string;
   experiences: Experience[];
   education: Education[];
-  skills: string[]; // Still string[] for simplicity in display, but for edit we might convert to Skill[]
+  skills: string[];
   languages: Language[];
   certifications: Certification[];
   jobPreferences: JobPreferences;
   contact: ContactInfo;
   cvLastUpdated: string;
-  cvFile?: File | null; // For direct file handling in the form
-  cvPdfUrl?: string; // URL if already uploaded
+  cvFile?: File | null;
+  cvPdfUrl?: string; // Main CV shown on profile page
+  userCvs: UserCV[]; // New: Array of user's uploaded CVs
 }
 
-// Dummy data for demonstration purposes
 export const dummyProfileData: ProfileData = {
   name: 'OUABBI Mohamed',
   title: 'Développeur Fullstack Senior',
   location: 'Paris, France',
-  avatarUrl: '/images/cv.jpg', // Make sure you have this image in your public folder
+  avatarUrl: '/images/cv.jpg',
   about: "Développeur Fullstack passionné avec plus de 8 ans d'expérience dans la création d'applications web robustes et évolutives. Expert en JavaScript, React, Node.js et bases de données NoSQL. Orienté solutions et toujours à la recherche de nouvelles technologies.",
   experiences: [
     {
@@ -139,8 +147,15 @@ export const dummyProfileData: ProfileData = {
     phone: '+33 6 12 34 56 78',
     linkedin: 'https://www.linkedin.com/in/jeandupont',
     website: 'https://www.jeandupontdev.com',
-    github: 'https://github.com/mohamedouabbi' // Added GitHub to dummy data
+    github: 'https://github.com/mohamedouabbi'
   },
   cvLastUpdated: '15/05/2024',
   cvPdfUrl: '/pdf/cv.pdf', // Example: pre-existing CV URL
+
+  // Add dummy CVs for selection
+  userCvs: [
+    { id: 'cv-1', name: 'Mon CV principal', url: '/pdf/cv.pdf', uploadedAt: '2024-05-15' },
+    { id: 'cv-2', name: 'CV Développeur Web', url: '/pdf/cv_web.pdf', uploadedAt: '2024-03-01' },
+    { id: 'cv-3', name: 'CV Tech Lead', url: '/pdf/cv_techlead.pdf', uploadedAt: '2023-11-20' },
+  ],
 };

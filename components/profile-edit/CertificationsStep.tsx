@@ -5,7 +5,7 @@ import StepWrapper from './StepWrapper';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { FaPlus, FaTrash } from 'react-icons/fa';
-import { Certification } from '@/data/dummyProfileData';
+import { Certification } from '@/data/defaultProfileData';
 
 interface CertificationsStepProps {
   certifications: Certification[];
