@@ -4,22 +4,17 @@
 export interface Job {
     id: string;
     title: string;
-    company: string;
+    company_id: string;
     location: string;
-    postedDate: string;
-    contractType: string;
+    created_at: string;
+    education: string;
     workMode: string;
     sector: string;
     description: string;
     imageUrl?: string;
     salary?: string;
     skills?: string[];
-    requirements?: {
-      diploma?: string[];
-      experience?: string;
-      languages?: string[];
-      other?: string[];
-    };
+    requirements?: string[];
     hasApplied?: boolean;
     matchScore?: number;
   }
