@@ -22,11 +22,10 @@ const Jobs: NextPage = () => {
 
  const searchParams = useSearchParams();
   const recruiterId = searchParams.get('recruiter_id') ?? '';
+  console.log(searchParams);
   useEffect(() => {
   
-      fetch( `http://localhost:5000/offers/by-recruiter?recruiter_id=${encodeURIComponent(
-        recruiterId
-      )}`)
+      fetch( `http://localhost:5000/offers/by-recruiter?recruiter_id=${ recruiterId  }`)
         .then((res) => {
           if (!res.ok) throw new Error('Failed to fetch jobs');
           return res.json();

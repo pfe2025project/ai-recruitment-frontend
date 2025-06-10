@@ -31,25 +31,19 @@ const menuItems = [
   { name: 'settings', label: 'Settings', icon: <FaCog /> },
   { name: 'users', label: 'Users', icon: <FaUserFriends /> },
   { name: 'messages', label: 'Messages', icon: <FaEnvelope /> },
-  { name: 'tasks', label: 'Tasks', icon: <FaTasks /> },
-  { name: 'calendar', label: 'Calendar', icon: <FaCalendarAlt /> },
-  { name: 'notifications', label: 'Notifications', icon: <FaBell /> },
-  { name: 'analytics', label: 'Analytics', icon: <FaChartPie /> },
-  { name: 'billing', label: 'Billing', icon: <FaCreditCard /> },
-  { name: 'media', label: 'Media', icon: <FaImage /> },
+
+
+
   { name: 'support', label: 'Support', icon: <FaHeadset /> },
-  { name: 'faq', label: 'FAQ', icon: <FaQuestionCircle /> },
-  { name: 'feedback', label: 'Feedback', icon: <FaCommentDots /> },
-  { name: 'security', label: 'Security', icon: <FaShieldAlt /> },
-  { name: 'integrations', label: 'Integrations', icon: <FaPuzzlePiece /> },
-  { name: 'logout', label: 'Logout', icon: <FaSignOutAlt /> },
+
+
 ];
 
 
   return (
-    <aside className=" w-100 bg-white shadow-md border-r flex flex-col">
+    <aside className="">
    
-      <nav className="flex-1 p-4 space-y-2 text-center">
+      <nav className="bg-gray-200 h-screen flex flex-col">
         {menuItems.map((item) => (
           <button
             key={item.name}

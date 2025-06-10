@@ -179,19 +179,57 @@ export default function Home() {
 
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div className="bg-gray-100 min-h-screen ">
 
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-1 bg-gray-200 p-4">
+        <div className="col-span-1 h-screen bg-gray-200 p-4">
           <DashboardLayout />
 
         </div>
-        <div className="col-span-10 bg-blue-100 p-4">
+        <div className="col-span-11 bg-blue-100 p-4">
           <Topbar />
+
+         <div className="flex mb-4 justify-between items-center">
+
+  <div>
+    <h1 className="text-xl font-bold text-gray-500">Recruiters Dashboard</h1>
+  </div>
+  
+  <div className="flex items-center gap-4">
+ 
+  
+
+    <select className="border border-1 border-gray-500 rounded-lg" name="" id="">
+      <option value="">01Jan2022 - 31Dec2022</option>
+      <option value="">01Feb2022 - 28Dec2022</option>
+      <option value="">01Mar2022 - 30Dec2022</option>
+      <option value="">01Apr2022 - 31Dec2022</option>
+      <option value="">01May2022 - 30Dec2022</option>
+      <option value="">01Jun2022 - 31Dec2022</option>
+      <option value="">01Jul2022 - 31Dec2022</option>
+      <option value="">01Aug2022 - 31Dec2022</option>
+      <option value="">01Sep2022 - 30Dec2022</option>
+      <option value="">01Oct2022 - 31Dec2022</option>
+      <option value="">01Nov2022 - 30Dec2022</option>
+      <option value="">01Dec2022 - 31Dec2022</option>
+ 
+    </select>
+
+    <label className="flex items-center gap-2 cursor-pointer bg-indigo-500 hover:bg-blue-700 text-white px-4 py-1 rounded-lg transition">
+    
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+      </svg>
+      <span> Export</span>
+      <input type="file" className="hidden" />
+    </label>
+  </div>
+</div>
+
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Applied Candidates */}
-            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border">
+            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border  border-gray-200">
               <div className=" rounded-full p-3 p-3 flex justify-between ">
                 <LuUsersRound className="text-indigo-500" size={24} />
                 <div className="text-xl font-bold text-indigo-500">400</div>
@@ -203,7 +241,7 @@ export default function Home() {
             </div>
 
             {/* Hired Candidates */}
-            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border">
+            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border border-gray-200">
               <div className=" rounded-full p-3  flex justify-between">
                 <TbUsersPlus className="text-green-600" size={24} />
                 <div className="text-xl font-bold text-green-600">200</div>
@@ -215,7 +253,7 @@ export default function Home() {
             </div>
 
             {/* Open Positions */}
-            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border">
+            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border border-gray-200">
               <div className=" rounded-full p-3  flex justify-between">
                 <PiBriefcaseLight className="text-cyan-500" size={24} />
                 <div className="text-xl font-bold text-cyan-500">240</div>
@@ -228,7 +266,7 @@ export default function Home() {
             </div>
 
             {/* Avg Cost Per Hire */}
-            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border">
+            <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border border-gray-200">
               <div className=" flex justify-between rounded-full p-3">
                 <PiMoneyLight className="text-yellow-500" size={24} />
                 <div className="text-xl font-bold text-yellow-500">$12</div>
@@ -242,7 +280,7 @@ export default function Home() {
 
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-6">
-            <div className="md:col-span-9 bg-white p-6 rounded-xl shadow-md">
+            <div className="md:col-span-8 bg-white p-6 rounded-xl shadow-md">
               <Bar data={data} options={options} />
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
@@ -268,13 +306,13 @@ export default function Home() {
               </div>
 
             </div>
-            <div className="md:col-span-3 bg-white p-6 rounded-xl shadow-md text-center">
+            <div className="md:col-span-4 max-w-xl mx-auto bg-white rounded-lg shadow p-6 space-y-6 ">
               <ChartsDashboard />
             </div>
           </div>
         </div>
 
-        <div className="col-span-1" />
+       
       </div>
 
 
