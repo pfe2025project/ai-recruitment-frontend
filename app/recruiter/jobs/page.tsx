@@ -7,6 +7,7 @@ import { useState, ChangeEvent, useEffect } from 'react';
 import { dummyJobs, Job } from '@/data/dummyJobs';
 
 import { useSearchParams } from 'next/navigation';
+import Header from '@/components/shared/header';
 
 
 
@@ -72,6 +73,8 @@ const Jobs: NextPage = () => {
 console.log(jobs)
   return (
     <>
+
+    <Header />
       <Head>
         <title>Jobs</title>
       </Head>

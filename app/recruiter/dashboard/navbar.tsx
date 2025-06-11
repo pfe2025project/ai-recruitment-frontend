@@ -173,7 +173,7 @@ const Topbar: React.FC = () => {
       
                           {isCandidate && (
                             <Link
-                              href={`/recruiter/jobs?recruiter_id=${user?.id}`}
+                              href={`/recruiter /jobs?recruiter_id=${user?.id}`}
                               className="block px-4 py-2 text-sm hover:bg-neutral-100"
                               style={{ color: getNeutralColor(700) }}
                               onClick={() => setShowDropdown(false)}
