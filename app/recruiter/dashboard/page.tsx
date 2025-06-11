@@ -32,10 +32,45 @@ import { PiBriefcaseLight, PiMoneyLight } from "react-icons/pi";
 import ChartsDashboard from "./chartjs";
 import DashboardLayout from "./SidBar";
 import Topbar from "./navbar";
+import { useEffect, useState } from "react";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-export default function Home() {
+export default  function Home() {
+  const [dataa , setDataa] =useState({});
+
+ async function getData(){
+ const res = await fetch(`http://127.0.0.1:5000/api/dashboard/summary`);
+ const data = await res.json();
+ setDataa(data);
+
+
+
+return data ;
+ 
+ 
+
+
+  }
+
+
+
+
+useEffect(()=>{
+   getData();
+},[])
+
+
+
+ console.log(dataa);
+
+ 
+  
+
+
+
+
+
   const data = {
     labels: [
       'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
@@ -232,7 +267,7 @@ export default function Home() {
             <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border  border-gray-200">
               <div className=" rounded-full p-3 p-3 flex justify-between ">
                 <LuUsersRound className="text-indigo-500" size={24} />
-                <div className="text-xl font-bold text-indigo-500">400</div>
+                <div className="text-xl font-bold text-indigo-500">{dataa?.appliedCandidates}</div>
               </div>
               <div>
 
@@ -244,7 +279,7 @@ export default function Home() {
             <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border border-gray-200">
               <div className=" rounded-full p-3  flex justify-between">
                 <TbUsersPlus className="text-green-600" size={24} />
-                <div className="text-xl font-bold text-green-600">200</div>
+                <div className="text-xl font-bold text-green-600">{dataa?.hiredCandidates}</div>
               </div>
               <div>
 
@@ -256,7 +291,7 @@ export default function Home() {
             <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border border-gray-200">
               <div className=" rounded-full p-3  flex justify-between">
                 <PiBriefcaseLight className="text-cyan-500" size={24} />
-                <div className="text-xl font-bold text-cyan-500">240</div>
+                <div className="text-xl font-bold text-cyan-500">{dataa?.openPositions}</div>
 
               </div>
               <div>
@@ -269,7 +304,7 @@ export default function Home() {
             <div className=" gap-4 bg-white rounded-xl px-6 py-4 shadow border border-gray-200">
               <div className=" flex justify-between rounded-full p-3">
                 <PiMoneyLight className="text-yellow-500" size={24} />
-                <div className="text-xl font-bold text-yellow-500">$12</div>
+                <div className="text-xl font-bold text-yellow-500">${dataa?.avgCostPerHire}</div>
               </div>
               <div>
 
