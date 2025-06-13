@@ -15,7 +15,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const router = useRouter(); 
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     // Vérifie si l'utilisateur est déjà authentifié au chargement de la page
     if (isAuthenticated()) {

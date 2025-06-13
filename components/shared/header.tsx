@@ -5,9 +5,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {  getCurrentUser, getSupabaseAccessToken, logout } from '@/lib/api/auth';
+import { getCurrentUser, logout } from '@/lib/api/auth';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+
+import { Users, Smartphone, FileText, Settings, Download, BarChart3, HelpCircle } from "lucide-react"
 
 const Header: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -15,6 +17,17 @@ const Header: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
+  const navigationItems = [
+   
+    { icon: Users, label: "Team" },
+    { icon: Smartphone, label: "Mobile" },
+    { icon: FileText, label: "Documents" },
+    { icon: Settings, label: "Settings" },
+    { icon: Download, label: "Downloads" },
+    { icon: BarChart3, label: "Analytics" },
+    { icon: HelpCircle, label: "Help" },
+  ]
+
 
   // Composants d'icônes SVG inline
   const BellIcon = () => (
@@ -40,16 +53,7 @@ const Header: React.FC = () => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        if (currentUser) {
-          console.log("uid ",currentUser.id);
-        }
-
-        const token = await getSupabaseAccessToken();
-        if (token) {
-          console.log("Access Token:", token);
-          // Tu peux maintenant l'utiliser dans un appel API avec:
-          // Authorization: Bearer ${token}
-        }
+        console.log(currentUser);
       } catch (error) {
         console.error("Erreur lors de la récupération de l'utilisateur :", error);
         setUser(null);
@@ -65,7 +69,7 @@ const Header: React.FC = () => {
     logout();
     setUser(null);
     setShowDropdown(false);
-    router.push('/');
+    router.push('/login');
 
   };
 
@@ -86,7 +90,7 @@ const Header: React.FC = () => {
   const isCandidate = getUserRole() === 'candidate';
 
   return (
-    <header style={{ backgroundColor: "white" }} className="shadow-md py-4">
+    <header style={{ backgroundColor: getNeutralColor(50) }} className="shadow-md py-4">
       <div className="container mx-auto px-6 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
@@ -103,119 +107,20 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Navigation Menu - Centered */}
-        <nav className="flex-1 flex justify-center">
-          <ul className="flex space-x-8">
-            <li>
-              <Link
-                href="/"
-                className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                style={{
-                  color: getNeutralColor(600),
-                  transitionProperty: 'color, background-color',
-                  transitionDuration: '200ms',
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = getPrimaryColor(600);
-                  (e.target as HTMLElement).style.backgroundColor = getPrimaryColor(50);
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = getNeutralColor(600);
-                  (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                }}
-              >
-                Accueil
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/about"
-                className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                style={{
-                  color: getNeutralColor(600),
-                  transitionProperty: 'color, background-color',
-                  transitionDuration: '200ms',
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = getPrimaryColor(600);
-                  (e.target as HTMLElement).style.backgroundColor = getPrimaryColor(50);
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = getNeutralColor(600);
-                  (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                }}
-              >
-                À propos
-              </Link>
-            </li>
-            {user && isCandidate && (
-              <>
-                <li>
-                  <Link
-                    href="/candidate/jobs"
-                    className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                    style={{
-                      color: getNeutralColor(600),
-                      transitionProperty: 'color, background-color',
-                      transitionDuration: '200ms',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = getPrimaryColor(600);
-                      (e.target as HTMLElement).style.backgroundColor = getPrimaryColor(50);
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = getNeutralColor(600);
-                      (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    Offres
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href={`/${getUserRole()}/dashboard`}
-                    className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                    style={{
-                      color: getNeutralColor(600),
-                      transitionProperty: 'color, background-color',
-                      transitionDuration: '200ms',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = getPrimaryColor(600);
-                      (e.target as HTMLElement).style.backgroundColor = getPrimaryColor(50);
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = getNeutralColor(600);
-                      (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-              </>
-            )}
-            <li>
-              <Link
-                href="/contact"
-                className="font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                style={{
-                  color: getNeutralColor(600),
-                  transitionProperty: 'color, background-color',
-                  transitionDuration: '200ms',
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = getPrimaryColor(600);
-                  (e.target as HTMLElement).style.backgroundColor = getPrimaryColor(50);
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = getNeutralColor(600);
-                  (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                }}
-              >
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </nav>
+        <nav className="hidden md:flex items-center space-x-6 flex-1 justify-center">
+            {navigationItems.map((item, index) => {
+              const IconComponent = item.icon
+              return (
+                <button
+                  key={index}
+                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 group"
+                  title={item.label}
+                >
+                  <IconComponent className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
+                </button>
+              )
+            })}
+          </nav>
 
         {/* User Section */}
         <div className="flex items-center space-x-4">
@@ -352,7 +257,7 @@ const Header: React.FC = () => {
 
                     {isCandidate && (
                       <Link
-                        href="/candidate/my-applications"
+                        href="/offers-applied"
                         className="block px-4 py-2 text-sm hover:bg-neutral-100"
                         style={{ color: getNeutralColor(700) }}
                         onClick={() => setShowDropdown(false)}

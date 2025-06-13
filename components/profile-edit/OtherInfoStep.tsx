@@ -2,7 +2,7 @@
 import React from 'react';
 import StepWrapper from './StepWrapper';
 import Input from '@/components/ui/Input';
-import { ProfileData } from '@/data/defaultProfileData';
+import { ProfileData } from '@/data/dummyProfileData';
 
 interface OtherInfoStepProps {
   profileData: ProfileData;

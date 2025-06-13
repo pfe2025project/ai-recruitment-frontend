@@ -98,3 +98,12 @@ body {
 
   }
 }
+  .chart-bar {
+      height: 10px;
+      border-radius: 5px;
+    }
+    .company-website { background-color: #6366f1; }
+    .job-boards { background-color: #94a3b8; }
+    .social-media { background-color: #dbecff; }
+    .career-fair { background-color: #33ccda; }
+    .referrals { background-color: #e5e7eb; }

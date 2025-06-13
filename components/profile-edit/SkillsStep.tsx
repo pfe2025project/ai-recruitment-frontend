@@ -3,7 +3,7 @@
 import React from 'react';
 import StepWrapper from './StepWrapper';
 import TagInput from '@/components/ui/TagInput';
-import { ProfileData } from '@/data/defaultProfileData';
+import { ProfileData } from '@/data/dummyProfileData';
 
 interface SkillsStepProps {
   profileData: ProfileData;

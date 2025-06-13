@@ -1,373 +1,109 @@
-"use client";
+// components/profile-edit/CVUploadStep.tsx
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import StepWrapper from './StepWrapper';
 import Button from '@/components/ui/Button';
-import { FaUpload, FaFilePdf, FaTimes, FaSpinner } from 'react-icons/fa';
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
-import { useProfile } from '@/context/ProfileContext';
-import { checkCVUploadStatus, deleteCVFromBackend, fetchExistingCVFromBackend, uploadCVToBackend } from '@/lib/api/cv';
-import Modal from '@/components/ui/Modal';
+import { FaUpload, FaFilePdf, FaTimes } from 'react-icons/fa';
 
-pdfjs.GlobalWorkerOptions.workerSrc = '/libs/pdfjs/pdf.worker.min.mjs';
+interface CVUploadStepProps {
+  onCVUpload: (file: File | null) => void;
+  existingCvUrl: string | null;
+  onExtractSkills: (file: File) => Promise<string[]>; // Callback to trigger skill extraction
+}
 
-const CVUploadStep: React.FC = () => {
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(800);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const { profileData, handleProfileDataChange } = useProfile();
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(profileData.cvFile ?? null);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(profileData.cvPdfUrl ?? null);
+const CVUploadStep: React.FC<CVUploadStepProps> = ({ onCVUpload, existingCvUrl, onExtractSkills }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const pdfViewerRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    const checkExistingCV = async () => {
-      try {
-        const hasCV = await checkCVUploadStatus();
-        if (hasCV && !selectedFile) {
-          setIsLoading(true);
-          setLoadingMessage('Loading your existing CV...');
-          
-          const cvData = await fetchExistingCVFromBackend();
-          if (cvData) {
-            setSelectedFile(cvData.file);
-            setPdfUrl(cvData.url);
-            handleProfileDataChange('cvFile', cvData.file);
-            handleProfileDataChange('cvPdfUrl', cvData.url);
-          }
-        }
-      } catch (err) {
-        console.error('Error checking for existing CV:', err);
-      } finally {
-        setIsLoading(false);
-        setLoadingMessage('');
-      }
-    };
-
-    checkExistingCV();
-  }, []);
-
-  useEffect(() => {
-    const updateWidth = () => {
-      if (containerRef.current) {
-        setContainerWidth(Math.min(containerRef.current.clientWidth - 40, 800));
-      }
-    };
-    
-    updateWidth();
-    const resizeObserver = new ResizeObserver(updateWidth);
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+    // If there's an existing CV URL, set a dummy file to represent it
+    if (existingCvUrl && !selectedFile) {
+      fetch(existingCvUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const file = new File([blob], 'current_cv.pdf', { type: 'application/pdf' });
+          setSelectedFile(file);
+        })
+        .catch(error => console.error("Error fetching existing CV:", error));
     }
-    
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateWidth);
-    };
-  }, []);
+  }, [existingCvUrl, selectedFile]);
 
-  useEffect(() => {
-    return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    };
-  }, [pdfUrl]);
 
-  const validatePDF = (file: File): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const arr = new Uint8Array(reader.result as ArrayBuffer);
-          // Check PDF magic number (first 4 bytes should be "%PDF")
-          const header = String.fromCharCode.apply(null, [...arr.subarray(0, 4)]);
-          resolve(header === '%PDF');
-        } catch (e) {
-          console.log(e);
-          resolve(false);
-        
-        }
-      };
-      reader.readAsArrayBuffer(file.slice(0, 4)); // Only read first 4 bytes
-    });
-  };
-
-  const extractSkills = async (): Promise<string[]> => {
-    setLoadingMessage('Extracting skills from CV...');
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return ['JavaScript', 'React', 'Node.js'];
-  };
-
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      
-      if (!file) {
-        setError("No file selected");
-        return;
-      }
-
-      // Add PDF validation check
-      const isValidPDF = await validatePDF(file);
-      if (!isValidPDF) {
-        setError("Invalid PDF file - file may be corrupted");
-        return;
-      }
-      
-      // Rest of your existing validation
-      if (file.type !== 'application/pdf') {
-        setError("Please upload a PDF file");
-        return;
-      }
-      
-      if (file.type !== 'application/pdf') {
-        setError("Please upload a PDF file");
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setLoadingMessage('Processing your CV...');
-        setError(null);
-        
-        if (pdfUrl) {
-          URL.revokeObjectURL(pdfUrl);
-          setPdfUrl(null);
-        }
-
-        const url = URL.createObjectURL(file);
-        setPdfUrl(url);
-        setNumPages(null);
-
-        const uploadResult = await uploadCVToBackend(file);
-        if (!uploadResult.success) {
-          throw new Error('Failed to upload CV to server');
-        }
-
-        const skills = await extractSkills();
-        
-        setSelectedFile(file);
-        handleProfileDataChange('cvFile', file);
-        handleProfileDataChange('cvPdfUrl', url);
-        handleProfileDataChange('skills', skills);
-        
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "An error occurred during upload";
-        setError(errorMessage);
-        console.error('Upload error:', err);
-        
-        if (pdfUrl) {
-          URL.revokeObjectURL(pdfUrl);
-          setPdfUrl(null);
-        }
-        setSelectedFile(null);
-      } finally {
-        setIsLoading(false);
-        setLoadingMessage('');
-      }
-    },
-    [pdfUrl, handleProfileDataChange]
-  );
-
-  const confirmDelete = () => {
-    setShowDeleteConfirm(true);
-  };
-
-  const handleRemoveFile = async () => {
-    try {
-      setIsLoading(true);
-      setLoadingMessage('Removing CV...');
-      setError(null);
-      
-      const deleteSuccess = await deleteCVFromBackend();
-      if (!deleteSuccess) {
-        throw new Error('Failed to delete CV from server');
-      }
-
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-      
-      setSelectedFile(null);
-      setPdfUrl(null);
-      setNumPages(null);
-
-      handleProfileDataChange('cvFile', null);
-      handleProfileDataChange('cvPdfUrl', '');
-      handleProfileDataChange('skills', []);
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to remove CV");
-      console.error('Remove error:', err);
-    } finally {
-      setIsLoading(false);
-      setLoadingMessage('');
-      setShowDeleteConfirm(false);
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file && file.type === 'application/pdf') {
+      setSelectedFile(file);
+      onCVUpload(file);
+      // Immediately trigger skill extraction
+      onExtractSkills(file).then(extractedSkills => {
+        console.log("Extracted Skills:", extractedSkills); // Log extracted skills for now
+        // In a real app, you'd pass these to the parent state to be used in SkillsStep
+      });
+    } else {
+      alert('Veuillez télécharger un fichier PDF.');
     }
-  };
+  }, [onCVUpload, onExtractSkills]);
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-  };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'application/pdf': ['.pdf']
-    },
-    maxFiles: 1,
-    maxSize: 5 * 1024 * 1024,
-    disabled: isLoading,
-    noClick: isLoading,
-    noKeyboard: isLoading
-  });
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    onCVUpload(null);
+  };
 
   return (
     <StepWrapper
-      title="Upload Your CV"
-      description="We'll extract key information from your CV to pre-fill your profile. Please upload a PDF file."
+      title="Téléchargez votre CV"
+      description="Nous allons extraire les informations clés de votre CV pour pré-remplir votre profil. Veuillez télécharger un fichier PDF."
     >
-      <Modal
-        isOpen={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirm(false)}
-        title="Confirm Delete"
-        size="sm"
-      >
-        <div className="space-y-4">
-          <p>Are you sure you want to delete your CV? This action cannot be undone.</p>
-          <div className="flex justify-end space-x-3">
-            <Button 
-              variant="secondary" 
-              onClick={() => setShowDeleteConfirm(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button 
-              variant="primary" 
-              onClick={handleRemoveFile}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Deleting...' : 'Delete CV'}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50 mb-6" {...getRootProps()}>
+        <input {...getInputProps()} />
+        {isDragActive ? (
+          <p className="text-primary-600">Déposez le fichier ici...</p>
+        ) : (
+          <p className="text-neutral-500">
+            Glissez-déposez votre CV ici, ou <span className="text-primary-600 font-semibold cursor-pointer">cliquez pour sélectionner</span>
+          </p>
+        )}
+        <FaUpload className="mx-auto mt-4 text-primary-500" size={30} />
+      </div>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md animate-fade-in">
-          {error}
-        </div>
-      )}
-
-      {isLoading && (
-        <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md flex items-center animate-fade-in">
-          <FaSpinner className="animate-spin mr-2" />
-          {loadingMessage}
-        </div>
-      )}
-
-      {!selectedFile && !pdfUrl && (
-        <div 
-          {...getRootProps()}
-          className={`p-6 border-2 border-dashed rounded-lg text-center mb-6 transition-all duration-300 ${
-            isLoading 
-              ? 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-70' 
-              : isDragActive
-                ? 'bg-blue-50 border-blue-500'
-                : 'bg-gray-50 border-gray-300 hover:border-primary-500 cursor-pointer opacity-100'
-          }`}
-        >
-          <input {...getInputProps()} />
-          {isDragActive ? (
-            <p className="text-blue-500">Drop your CV here...</p>
-          ) : (
-            <>
-              <p className="text-neutral-500">
-                Drag and drop your CV here, or{' '}
-                <span className="text-primary-600 font-semibold">click to select</span>
-              </p>
-              <FaUpload className="mx-auto mt-4 text-primary-500 animate-bounce" size={30} />
-              <p className="text-sm text-neutral-400 mt-2">PDF files only (max 5MB)</p>
-            </>
-          )}
-        </div>
-      )}
-
-      {(selectedFile || pdfUrl) && (
+      {selectedFile && (
         <div className="mb-6 bg-primary-50 p-4 rounded-lg flex items-center justify-between shadow-sm animate-fade-in">
-          <div className="flex items-center truncate max-w-[80%]">
-            <FaFilePdf className="text-red-500 mr-3 flex-shrink-0" size={24} />
-            <span className="text-neutral-700 font-medium truncate">
-              {selectedFile?.name || "Current CV"}
-            </span>
+          <div className="flex items-center">
+            <FaFilePdf className="text-red-500 mr-3" size={24} />
+            <span className="text-neutral-700 font-medium">{selectedFile.name}</span>
           </div>
-          <Button 
-            onClick={confirmDelete} 
-            variant="primary" 
-            className="p-2 rounded-full hover:scale-105 transition-transform"
-            disabled={isLoading}
-          >
+          <Button onClick={handleRemoveFile} variant="primary" className="p-2 rounded-full">
             <FaTimes size={16} />
           </Button>
         </div>
       )}
 
-      {pdfUrl && !isLoading && (
-        <div
-          ref={containerRef}
-          className="mt-6 border border-gray-300 rounded-lg overflow-auto p-4 h-[400px] flex justify-center bg-gray-100 animate-fade-in"
-        >
-          <Document
-            file={pdfUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={(error) => {
-              console.error('PDF load error:', error);
-              setError("Failed to load PDF - file may be corrupted");
-              setPdfUrl(null);
-              setSelectedFile(null);
-            }}
-            loading={
-              <div className="h-full flex items-center justify-center">
-                <div className="flex flex-col items-center">
-                  <FaSpinner className="animate-spin text-primary-500 mb-2" size={24} />
-                  <p>Loading PDF preview...</p>
-                </div>
-              </div>
-            }
-            error={
-              <div className="h-full flex items-center justify-center text-red-500">
-                Failed to load PDF (invalid or corrupted file)
-              </div>
-            }
-          >
-            {Array.from(new Array(numPages), (_, index) => (
-              <Page
-                key={`page_${index + 1}`}
-                pageNumber={index + 1}
-                width={containerWidth}
-                className="border border-gray-200 mb-4 bg-white animate-fade-in"
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                loading={
-                  <div className="flex flex-col items-center justify-center h-full">
-                    <FaSpinner className="animate-spin text-primary-500 mb-2" size={24} />
-                    <p>Loading page {index + 1}...</p>
-                  </div>
-                }
-              />
-            ))}
-          </Document>
+      {/* PDF Viewer */}
+      {selectedFile && (
+        <div className="mt-6 border border-gray-300 rounded-lg overflow-hidden h-[400px]">
+          <iframe
+            ref={pdfViewerRef}
+            src={URL.createObjectURL(selectedFile)}
+            width="100%"
+            height="100%"
+            title="Aperçu du CV"
+            className="w-full h-full"
+          />
         </div>
+      )}
+      {/* If no file, but existingCvUrl, display it initially (not directly handled by selectedFile state for upload) */}
+      {!selectedFile && existingCvUrl && (
+         <div className="mt-6 border border-gray-300 rounded-lg overflow-hidden h-[400px]">
+         <iframe
+           src={existingCvUrl}
+           width="100%"
+           height="100%"
+           title="Aperçu du CV existant"
+           className="w-full h-full"
+         />
+       </div>
       )}
     </StepWrapper>
   );

@@ -11,6 +11,12 @@ const config = {
   theme: {
     extend: {
       colors: {
+
+                                'hire-blue': '#3b82f6',
+                        'hire-green': '#10b981',
+                        'hire-purple': '#8b5cf6',
+                        'hire-orange': '#f59e0b',
+                        'hire-pink': '#ec4899',
         // Définition des couleurs primaires et secondaires comme variables CSS
         // Cela permet de les utiliser à la fois via les classes Tailwind et en ligne
         primary: {

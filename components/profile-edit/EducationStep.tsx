@@ -6,7 +6,7 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
 import { FaPlus, FaTrash } from 'react-icons/fa';
-import { Education } from '@/data/defaultProfileData';
+import { Education } from '@/data/dummyProfileData';
 
 interface EducationStepProps {
   education: Education[];

@@ -2,7 +2,7 @@
 import React from 'react';
 import StepWrapper from './StepWrapper';
 import Textarea from '@/components/ui/Textarea';
-import { ProfileData } from '@/data/defaultProfileData';
+import { ProfileData } from '@/data/dummyProfileData';
 
 interface AboutStepProps {
   profileData: ProfileData;

@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase/client'
 import { User, Session } from '@supabase/supabase-js'; // Importation des types User et Session
 
 // URL de base de votre backend Flask
-const FLASK_API_BASE_URL = 'http://127.0.0.1:5000/';
+const FLASK_API_BASE_URL = 'http://127.0.0.1:5000/auth';
 
 interface AuthResult {
   session: Session | null;
@@ -22,11 +22,12 @@ async function createProfileInBackend(
   fullName?: string // Peut être undefined, pour les utilisateurs OAuth
 ) {
   try {
-    const response = await fetch(`${FLASK_API_BASE_URL}/auth/sync-profile`, { // <-- Nouvel endpoint ici
+    const response = await fetch(`${FLASK_API_BASE_URL}/sync-profile`, { // <-- Nouvel endpoint ici
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: "include",
       body: JSON.stringify({
         id: userId,
         email: email,
@@ -200,7 +201,6 @@ export async function handleAuthCallback(): Promise<Session | null> {
 
 // --- Fonctions de gestion de session locales (basées sur Supabase) ---
 export function getAccessToken(): string | null {
-  // console.log("token == > ",localStorage.getItem('supabase_access_token'));
   return typeof window !== 'undefined' ? localStorage.getItem('supabase_access_token') : null;
 }
 
@@ -231,25 +231,4 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   return user;
-}
-
-
-// récupérer le token d'authentification (access token) dans Supabase
-export async function getSupabaseAccessToken(): Promise<string | null> {
-  const {
-    data: { session },
-    error
-  } = await supabase.auth.getSession();
-
-  if (error) {
-    console.error("Erreur lors de la récupération du token d'accès:", error.message);
-    return null;
-  }
-
-  if (!session) {
-    console.warn("Aucune session trouvée.");
-    return null;
-  }
-
-  return session.access_token;
 }
