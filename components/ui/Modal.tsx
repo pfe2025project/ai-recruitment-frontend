@@ -66,7 +66,7 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto z-[110]">
       <div className="fixed inset-0 bg-gray-800 opacity-50 transition-opacity" />
 
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">

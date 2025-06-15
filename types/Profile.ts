@@ -23,7 +23,7 @@ export interface Skill {
 
 export interface Language {
   name: string;
-  level: string;
+  proficiency: string;
 }
 
 export interface Certification {
@@ -48,6 +48,8 @@ export interface ContactInfo {
   github?: string; // Added GitHub
 }
 
+
+
 export interface ProfileData {
   name: string;
   title: string;
@@ -56,7 +58,13 @@ export interface ProfileData {
   about: string;
   experiences: Experience[];
   education: Education[];
-  skills: string[]; // Still string[] for simplicity in display, but for edit we might convert to Skill[]
+  skills: {
+            extracted: {
+              pySkills: string[];
+              skillnerSkills: string[];
+            };
+            added: string[];
+          };
   languages: Language[];
   certifications: Certification[];
   jobPreferences: JobPreferences;

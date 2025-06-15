@@ -31,57 +31,49 @@ export async function checkCVUploadStatus(): Promise<boolean> {
   }
 }
 
-
 /**
- * Get the URL of the existing CV for the current authenticated user
+ * Fetch the CV URL and file as a File object for the current authenticated user
  */
-export const fetchExistingCVFromBackend = async (): Promise<string | null> => {
+export const fetchExistingCVFromBackend = async (): Promise<{ url: string; file: File } | null> => {
   const token = await getSupabaseAccessToken();
   if (!token) return null;
 
   try {
-    const res = await fetch(FLASK_API_BASE_URL, {
+    // Step 1: Get the CV URL
+    const urlRes = await fetch(FLASK_API_BASE_URL, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
-    if (!res.ok) throw new Error('Failed to fetch CV URL');
+    if (!urlRes.ok) throw new Error('Failed to fetch CV URL');
 
-    const data = await res.json();
-    return data.cv_url || null;
+    const data = await urlRes.json();
+    const cvUrl = data.cv_url;
+    if (!cvUrl) return null;
+
+    // Step 2: Fetch the actual file from the URL
+    const fileRes = await fetch(cvUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!fileRes.ok) throw new Error('Failed to fetch CV file');
+
+    const blob = await fileRes.blob();
+
+    // Create a File object (you can change the name or infer from URL if needed)
+    const file = new File([blob], 'cv.pdf', { type: blob.type });
+
+    return { url: cvUrl, file };
   } catch (error) {
     console.error('fetchExistingCVFromBackend:', error);
     return null;
   }
 };
 
-/**
- * Download CV for the current authenticated user
- */
-export const downloadCVFromBackend = async (): Promise<boolean> => {
-  const token = await getSupabaseAccessToken();
-  if (!token) return false;
 
-  try {
-    // First get the CV URL
-    const cvUrl = await fetchExistingCVFromBackend();
-    if (!cvUrl) return false;
-
-    // Create a temporary anchor element to trigger download
-    const a = document.createElement('a');
-    a.href = cvUrl;
-    a.download = 'cv.pdf'; // You can customize the filename here
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    return true;
-  } catch (error) {
-    console.error('downloadCVFromBackend:', error);
-    return false;
-  }
-};
 
 /**
  * Upload CV for the current authenticated user

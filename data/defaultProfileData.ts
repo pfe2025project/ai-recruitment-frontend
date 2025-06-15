@@ -8,7 +8,13 @@ export const defaultProfileData: ProfileData = {
   about: '',
   experiences: [],
   education: [],
-  skills: [],
+  skills: {
+    extracted: {
+      pySkills: [],
+      skillnerSkills: []
+    },
+    added: []
+  },
   languages: [],
   certifications: [],
   jobPreferences: {

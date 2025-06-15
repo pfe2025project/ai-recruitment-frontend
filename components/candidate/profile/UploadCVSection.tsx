@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import { pdfjs } from 'react-pdf';
-import Button from '../ui/Button';
-import FileUploadIcon from '../icons/FileUploadIcon';
-import PdfViewerModal from '../ui/PdfViewerModal';
+import Button from '../../ui/Button';
+import FileUploadIcon from '../../icons/FileUploadIcon';
+import PdfViewerModal from '../../ui/PdfViewerModal';
 // Set the workerSrc to the CDN version to avoid import issues
 pdfjs.GlobalWorkerOptions.workerSrc = '/libs/pdfjs/pdf.worker.min.mjs';
 

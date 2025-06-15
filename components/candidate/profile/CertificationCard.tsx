@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 // components/candidate/CertificationCard.tsx
 import React from 'react';
-import ExternalLinkIcon from '../icons/ExternalLinkIcon';
+import ExternalLinkIcon from '../../icons/ExternalLinkIcon';
 
 interface CertificationCardProps {
   name: string;

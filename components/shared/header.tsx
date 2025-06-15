@@ -328,7 +328,7 @@ const Header: React.FC = () => {
                   {/* Part 2: Dashboard Button */}
                   <div className="px-4 py-1 ">
                       <Link
-                        href="/dashboard"
+                        href="/candidate/dashboard"
                         className="w-full block text-sm text-center py-2 rounded border border-neutral-500 hover:bg-neutral-800 hover:text-neutral-100 transition"
                         // style={{ color: getNeutralColor(700) }}
                         onClick={() => setShowDropdown(false)}
@@ -352,7 +352,7 @@ const Header: React.FC = () => {
 
                     {isCandidate && (
                       <Link
-                        href="/candidate/my-applications"
+                        href="/candidate/applications"
                         className="block px-4 py-2 text-sm hover:bg-neutral-100"
                         style={{ color: getNeutralColor(700) }}
                         onClick={() => setShowDropdown(false)}

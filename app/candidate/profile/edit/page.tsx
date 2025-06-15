@@ -4,184 +4,46 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Dummy data & types import (you should replace these with your actual data)
-import { dummyProfileData, ProfileData } from '@/data/dummyProfileData2';
-
-// Steps Components (import your actual components here)
-import CVUploadStep from '@/components/profile-edit/CVUploadStep';
-import BasicInfoStep from '@/components/profile-edit/BasicInfoStep';
-import AboutStep from '@/components/profile-edit/AboutStep';
-import EducationStep from '@/components/profile-edit/EducationStep';
-import ExperienceStep from '@/components/profile-edit/ExperienceStep';
-import SkillsStep from '@/components/profile-edit/SkillsStep';
-import CertificationsStep from '@/components/profile-edit/CertificationsStep';
-import OtherInfoStep from '@/components/profile-edit/OtherInfoStep';
-import JobPreferencesStep from '@/components/profile-edit/JobPreferencesStep';
-
 // Icons
-import {
-  FaFileUpload,
-  FaUser,
-  FaInfoCircle,
-  FaGraduationCap,
-  FaBriefcase,
-  FaTools,
-  FaCertificate,
-  FaSuitcase,
-  FaEllipsisH,
-  FaArrowLeft
-} from 'react-icons/fa';
+import { FaArrowLeft, FaCheck, FaSpinner } from 'react-icons/fa';
+import { steps } from '@/lib/candidate/config/steps';
+import { updateFullProfile } from '@/lib/api/profile';
+import { useProfile } from '@/context/ProfileContext';
+import { toast } from 'react-toastify';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ProfileEditPage: React.FC = () => {
   const router = useRouter();
-
-  // Current selected step id
   const [selectedStepId, setSelectedStepId] = useState<string>('cv-upload');
-
-  // Main profile data state
-  const [profileData, setProfileData] = useState<ProfileData>(dummyProfileData);
-
-  // Extracted skills from CV upload simulation
-  const [extractedSkills, setExtractedSkills] = useState<string[]>([]);
-
-  // Simulate CV skills extraction (mock async function)
-  const simulateCVExtraction = async (file: File): Promise<string[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const skills = ['Python', 'Data Analysis', 'SQL'];
-    setExtractedSkills(skills);
-    return skills;
-  };
-
-  // Handle changes to profile data fields (generic)
-  const handleProfileDataChange = <K extends keyof ProfileData>(
-    field: K,
-    value: ProfileData[K]
-  ) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Handle changes in contact info (nested object)
-  const handleContactInfoChange = <K extends keyof ProfileData['contact']>(
-    field: K,
-    value: ProfileData['contact'][K]
-  ) => {
-    setProfileData((prev) => ({
-      ...prev,
-      contact: { ...prev.contact, [field]: value }
-    }));
-  };
-
-  // Handle job preferences changes (nested object)
-  const handleJobPreferencesChange = <K extends keyof ProfileData['jobPreferences']>(
-    field: K,
-    value: ProfileData['jobPreferences'][K]
-  ) => {
-    setProfileData((prev) => ({
-      ...prev,
-      jobPreferences: { ...prev.jobPreferences, [field]: value }
-    }));
-  };
-
-  // Steps configuration
-  const steps = [
-    {
-      id: 'cv-upload',
-      name: 'Télécharger le CV',
-      icon: <FaFileUpload className="inline-block mr-2" />,
-      component: (
-        <CVUploadStep /> 
-      )
-    },
-    {
-      id: 'basic-info',
-      name: 'Infos de base',
-      icon: <FaUser className="inline-block mr-2" />,
-      component: (
-        <BasicInfoStep
-          profileData={profileData}
-          onChange={handleProfileDataChange}
-          onContactChange={handleContactInfoChange}
-        />
-      )
-    },
-    {
-      id: 'about',
-      name: 'À propos',
-      icon: <FaInfoCircle className="inline-block mr-2" />,
-      component: (
-        <AboutStep profileData={profileData} onChange={handleProfileDataChange} />
-      )
-    },
-    {
-      id: 'education',
-      name: 'Formation',
-      icon: <FaGraduationCap className="inline-block mr-2" />,
-      component: (
-        <EducationStep
-          education={profileData.education}
-          onChange={(newEdu) => handleProfileDataChange('education', newEdu)}
-        />
-      )
-    },
-    {
-      id: 'experience',
-      name: 'Expériences',
-      icon: <FaBriefcase className="inline-block mr-2" />,
-      component: (
-        <ExperienceStep
-          experiences={profileData.experiences}
-          onChange={(newExp) => handleProfileDataChange('experiences', newExp)}
-        />
-      )
-    },
-    {
-      id: 'skills',
-      name: 'Compétences',
-      icon: <FaTools className="inline-block mr-2" />,
-      component: (
-        <SkillsStep
-          profileData={profileData}
-          onChange={(field, value) => handleProfileDataChange(field, value as string[])}
-          extractedSkills={extractedSkills}
-        />
-      )
-    },
-    {
-      id: 'certifications',
-      name: 'Certifications',
-      icon: <FaCertificate className="inline-block mr-2" />,
-      component: (
-        <CertificationsStep
-          certifications={profileData.certifications}
-          onChange={(certs) => handleProfileDataChange('certifications', certs)}
-        />
-      )
-    },
-    {
-      id: 'job-preferences',
-      name: 'Préférences d\'emploi',
-      icon: <FaSuitcase className="inline-block mr-2" />,
-      component: (
-        <JobPreferencesStep
-          jobPreferences={profileData.jobPreferences}
-          onChange={handleJobPreferencesChange}
-        />
-      )
-    },
-    {
-      id: 'other-info',
-      name: 'Autres infos',
-      icon: <FaEllipsisH className="inline-block mr-2" />,
-      component: (
-        <OtherInfoStep
-          profileData={profileData}
-          onContactChange={handleContactInfoChange}
-        />
-      )
-    }
-  ];
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const { profileData } = useProfile();
 
   const selectedStep = steps.find((step) => step.id === selectedStepId);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+    
+    try {
+      const response = await updateFullProfile(profileData);
+      
+      if (response.success) {
+        toast.success('Profile saved successfully!');
+        setSaveSuccess(true);
+        
+        // Reset success state after 2 seconds
+        setTimeout(() => setSaveSuccess(false), 2000);
+      } else {
+        toast.error('Failed to save profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error('An error occurred while saving your profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -203,9 +65,11 @@ const ProfileEditPage: React.FC = () => {
             <h3 className="text-lg font-bold mb-6">Sections</h3>
             <ul className="space-y-4">
               {steps.map((step) => (
-                <li
+                <motion.li
                   key={step.id}
                   onClick={() => setSelectedStepId(step.id)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={`cursor-pointer p-2 rounded-lg flex items-center transition ${
                     selectedStepId === step.id
                       ? 'bg-blue-100 text-blue-600 font-medium'
@@ -214,28 +78,79 @@ const ProfileEditPage: React.FC = () => {
                 >
                   {step.icon}
                   {step.name}
-                </li>
+                </motion.li>
               ))}
             </ul>
           </aside>
 
           {/* Right content */}
-          <main className="flex-1 bg-white p-6 shadow rounded-xl flex flex-col justify-between">
+          <main className="flex-1 bg-white p-6 shadow rounded-xl flex flex-col">
             <div>
               <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                {selectedStep?.icon}
-                {selectedStep?.name}
+                {/* {selectedStep?.icon} */}
+                {/* {selectedStep?.name} */}
               </h2>
               {selectedStep?.component}
             </div>
 
-            <div className="mt-6">
-              <button
-                onClick={() => alert('Données enregistrées avec succès !')}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition"
-              >
-                Enregistrer
-              </button>
+            <div className="mt-6 flex justify-end">
+              <AnimatePresence mode="wait">
+                {saveSuccess ? (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <button
+                      className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow flex items-center gap-2 transition-colors"
+                      disabled
+                    >
+                      <FaCheck className="animate-bounce" />
+                      Enregistré avec succès !
+                    </button>
+                  </motion.div>
+                ) : isSaving ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <button
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow flex items-center gap-2 transition-colors"
+                      disabled
+                    >
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                      >
+                        <FaSpinner />
+                      </motion.span>
+                      Enregistrement...
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="normal"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <motion.button
+                      onClick={handleSave}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg shadow flex items-center gap-2 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Enregistrer
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </main>
         </div>

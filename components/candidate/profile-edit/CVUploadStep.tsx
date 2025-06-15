@@ -10,6 +10,8 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import { useProfile } from '@/context/ProfileContext';
 import { checkCVUploadStatus, deleteCVFromBackend, fetchExistingCVFromBackend, uploadCVToBackend } from '@/lib/api/cv';
 import Modal from '@/components/ui/Modal';
+import { extract_profile_info } from '@/lib/api/parser';
+import { fetchprofiledata } from '@/lib/data/profile';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/libs/pdfjs/pdf.worker.min.mjs';
 
@@ -22,8 +24,7 @@ const CVUploadStep: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { profileData, handleProfileDataChange } = useProfile();
-
+  const { profileData, handleProfileDataChange, handleContactInfoChange, handleJobPreferencesChange } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(profileData.cvFile ?? null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(profileData.cvPdfUrl ?? null);
 
@@ -98,10 +99,23 @@ const CVUploadStep: React.FC = () => {
     });
   };
 
-  const extractSkills = async (): Promise<string[]> => {
-    setLoadingMessage('Extracting skills from CV...');
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return ['JavaScript', 'React', 'Node.js'];
+  const extractAndUpdateProfileInfo = async () => {
+    try {
+      setLoadingMessage('Extraction des informations depuis votre CV...');
+      
+      const res = await extract_profile_info();
+      console.log( "parsed data",res);
+      
+      if (res.success) {
+        fetchprofiledata(profileData,handleProfileDataChange,handleJobPreferencesChange);
+      }
+    } catch (err) {
+      console.error("Error extracting profile information:", err);
+      setError("An error occurred while parsing your CV");
+      throw err; // Important pour interrompre le flux en cas d'erreur
+    } finally {
+      setLoadingMessage('');
+    }
   };
 
   const onDrop = useCallback(
@@ -155,12 +169,13 @@ const CVUploadStep: React.FC = () => {
           throw new Error('Failed to upload CV to server');
         }
 
-        const skills = await extractSkills();
         
         setSelectedFile(file);
         handleProfileDataChange('cvFile', file);
         handleProfileDataChange('cvPdfUrl', url);
-        handleProfileDataChange('skills', skills);
+
+        await extractAndUpdateProfileInfo();
+
         
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "An error occurred during upload";
@@ -177,8 +192,7 @@ const CVUploadStep: React.FC = () => {
         setLoadingMessage('');
       }
     },
-    [pdfUrl, handleProfileDataChange]
-  );
+   [pdfUrl, handleProfileDataChange, handleContactInfoChange, handleJobPreferencesChange]  );
 
   const confirmDelete = () => {
     setShowDeleteConfirm(true);
@@ -203,7 +217,7 @@ const CVUploadStep: React.FC = () => {
 
       handleProfileDataChange('cvFile', null);
       handleProfileDataChange('cvPdfUrl', '');
-      handleProfileDataChange('skills', []);
+      handleProfileDataChange('skills', { extracted: { pySkills: [], skillnerSkills: [] }, added: [] });
       
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to remove CV");
@@ -241,8 +255,9 @@ const CVUploadStep: React.FC = () => {
         onClose={() => setShowDeleteConfirm(false)}
         title="Confirm Delete"
         size="sm"
+      
       >
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           <p>Are you sure you want to delete your CV? This action cannot be undone.</p>
           <div className="flex justify-end space-x-3">
             <Button 
