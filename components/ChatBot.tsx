@@ -2,7 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Job } from '@/data/dummyJobs';
+import { Job } from '@/types/Job';
+import { fetchJobs } from '@/lib/api/job';
+import { useEffect } from 'react';
 
 type Message = {
   content: string;
@@ -10,14 +12,28 @@ type Message = {
   jobs?: Job[];
 };
 
-export default function ChatBot({ jobs, pageContext }: { jobs: Job[], pageContext?: string }) {
+export default function ChatBot({ pageContext }: { pageContext?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchedJobs, setFetchedJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    const loadJobs = async () => {
+      try {
+        const jobsData = await fetchJobs(); // You might want to pass params here
+        setFetchedJobs(jobsData);
+      } catch (error) {
+        console.error('Failed to fetch jobs for chatbot:', error);
+        // Optionally, set some default/empty jobs or show an error
+      }
+    };
+    loadJobs();
+  }, []);
 
   const handleLocationFilter = (location: string) => {
-    return jobs.filter(job =>
+    return fetchedJobs.filter(job =>
       job.location.toLowerCase().includes(location.toLowerCase())
     );
   };
@@ -27,7 +43,7 @@ export default function ChatBot({ jobs, pageContext }: { jobs: Job[], pageContex
     const jobTypeMatch = query.match(/(frontend|backend|fullstack)/i);
     const skillMatch = query.match(/(react|node\.js|python)/i);
 
-    let filtered = jobs;
+    let filtered = fetchedJobs;
 
     if (locationMatch) {
       filtered = handleLocationFilter(locationMatch[2]);
@@ -61,11 +77,11 @@ export default function ChatBot({ jobs, pageContext }: { jobs: Job[], pageContex
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer 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',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model:"deepseek/deepseek-r1-0528-qwen3-8b:free",
+        model: "deepseek/deepseek-r1-0528:free",
         messages: [{ role: 'user', content: contextPrompt + query }],
       }),
     });
@@ -136,7 +152,7 @@ export default function ChatBot({ jobs, pageContext }: { jobs: Job[], pageContex
                 {msg.jobs?.map((job, i) => (
                   <div key={i} className="mt-2 p-2 bg-gray-100 border rounded-md text-sm">
                     <div className="font-medium">{job.title}</div>
-                    <div>{job.company} – {job.location}</div>
+                    <div>{job.company?.name} – {job.location}</div>
                   </div>
                 ))}
               </div>
