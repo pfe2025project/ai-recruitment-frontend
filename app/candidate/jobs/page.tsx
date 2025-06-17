@@ -140,7 +140,9 @@ const JobSearchPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header with Search */}
-      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 py-12 px-6 text-white">
+      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 py-12 px-6 text-white" style={{
+            backgroundImage: `linear-gradient(to right, var(--primary-600), var(--secondary-700))`
+          }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-3">Find Your Dream Job</h1>
@@ -151,7 +153,7 @@ const JobSearchPage = () => {
           <div className="max-w-3xl mx-auto">
             <div className="relative">
               <div className="absolute z-[10] inset-y-0 left-0 pl-4 flex items-center ">
-                <FaSearch className="text-gray-100" />
+                <FaSearch className="text-gray-100  " />
               </div>
               <input
                 type="text"
@@ -163,7 +165,7 @@ const JobSearchPage = () => {
               />
               <button
                 onClick={handleSearch} 
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-800 bg-white rounded-md hover:bg-white transition-colors shadow-sm"
+                className="absolute cursor-pointer right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-800 bg-white rounded-md hover:bg-white transition-colors shadow-sm"
               >
                 <FaSearch className="text-gray-800" />
                 Search

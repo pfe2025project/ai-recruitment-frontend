@@ -5,12 +5,15 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import { MdWork, MdLocationOn, MdCalendarToday, MdAccessTime, MdPeople, MdEmail, MdLanguage } from 'react-icons/md';
-import { FaMoneyBillAlt, FaArrowLeft, FaCheckCircle, FaBookmark, FaRegBookmark, FaStar, FaLinkedin, FaGlobe } from 'react-icons/fa';
+import { FaMoneyBillAlt, FaArrowLeft, FaCheckCircle, FaBookmark, FaRegBookmark, FaStar, FaLinkedin, FaGlobe, FaTimes } from 'react-icons/fa';
 import { IoDiamondOutline } from 'react-icons/io5';
 import { fetchJobById, fetchRecommendedJobs } from '@/lib/api/job';
 import { Job } from '@/types/Job';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ApplyModal from '@/components/candidate/application/ApplyModal';
+import { createApplication, getUserApplications, updateApplication } from '@/lib/api/application';
+import { getCurrentUser } from '@/lib/api/auth';
+import { Application } from '@/types/Application';
 
 const JobDetailPage: React.FC = () => {
   const params = useParams();
@@ -25,6 +28,73 @@ const JobDetailPage: React.FC = () => {
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicationSuccess, setApplicationSuccess] = useState(false);
+  const [applicationError, setApplicationError] = useState<string | null>(null);
+  const [currentApplication, setCurrentApplication] = useState<Application | null>(null);
+
+  const checkUserApplications = async () => {
+    try {
+      const user = await getCurrentUser();
+      
+      if (!user || !user.id) {
+        console.log("No user logged in");
+        setIsApplied(false);
+        return;
+      }
+
+      const applications = await getUserApplications(user.id);
+      console.log("applications", applications.applications);
+      
+      // Check if any application matches the current job ID
+      const userApplication = applications.applications.find(
+        (app: { job_id: string }) => app.job_id === jobId
+      );
+      
+      setIsApplied(!!userApplication);
+      if (userApplication) {
+        setCurrentApplication(userApplication.id);
+      }
+    } catch (error) {
+      console.error("Error checking applications:", error);
+      setIsApplied(false);
+    }
+  };
+
+  // Add this handler function for editing applications
+  const handleEditApplication = async (applicationId: string, cv: File | string, coverLetter: string | File) => {
+    setIsSubmitting(true);
+    setApplicationError(null);
+    
+    try {
+      const cvOption = typeof cv === 'string' ? 'default' : 'custom';
+      const customCv = typeof cv === 'string' ? undefined : cv;
+      const coverLetterText = typeof coverLetter === 'string' ? coverLetter : undefined;
+      const coverLetterFile = typeof coverLetter === 'string' ? undefined : coverLetter;
+
+      const result = await updateApplication(
+        applicationId,
+        cvOption,
+        customCv,
+        coverLetterText,
+        coverLetterFile
+      );
+
+      if (result.success) {
+        setApplicationSuccess(true);
+        setIsApplyModalOpen(false);
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => setApplicationSuccess(false), 5000);
+      } else {
+        setApplicationError(result.error || 'Failed to update application');
+      }
+    } catch (error) {
+      setApplicationError(error instanceof Error ? error.message : 'Failed to update application');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +121,7 @@ const JobDetailPage: React.FC = () => {
     };
 
     fetchData();
+    checkUserApplications();
   }, [jobId]);
 
   // ... (keep your existing handler functions)
@@ -154,12 +225,73 @@ const JobDetailPage: React.FC = () => {
     );
   }
 
-  function handleConfirmApplication(jobId: string, cv: File | null, coverLetter: string): void {
-    throw new Error('Function not implemented.');
+const handleConfirmApplication = async (jobId: string, cv: File | string, coverLetter: string | File) => {
+  setIsSubmitting(true);
+  setApplicationError(null);
+  
+  try {
+    const cvOption = typeof cv === 'string' ? 'default' : 'custom';
+    const customCv = typeof cv === 'string' ? undefined : cv;
+    const coverLetterText = typeof coverLetter === 'string' ? coverLetter : undefined;
+    const coverLetterFile = typeof coverLetter === 'string' ? undefined : coverLetter;
+
+    const result = await createApplication(
+      jobId,
+      cvOption,
+      customCv,
+      coverLetterText,
+      coverLetterFile
+    );
+
+    if (result.success) {
+      setApplicationSuccess(true);
+      setIsApplied(true);
+      setIsApplyModalOpen(false);
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => setApplicationSuccess(false), 5000);
+    } else {
+      setApplicationError(result.error || 'Failed to submit application');
+    }
+  } catch (error) {
+    setApplicationError(error instanceof Error ? error.message : 'Failed to submit application');
+  } finally {
+    setIsSubmitting(false);
   }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
+       {/* Success/Error Toasts */}
+    {applicationSuccess && (
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg flex items-center">
+          <FaCheckCircle className="mr-2" />
+          <span>Application submitted successfully!</span>
+          <button 
+            onClick={() => setApplicationSuccess(false)}
+            className="ml-4 text-green-700 hover:text-green-900"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+    )}
+    
+    {applicationError && (
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg flex items-center">
+          <FaTimes className="mr-2" />
+          <span>{applicationError}</span>
+          <button 
+            onClick={() => setApplicationError(null)}
+            className="ml-4 text-red-700 hover:text-red-900"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+    )}
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
@@ -257,21 +389,55 @@ const JobDetailPage: React.FC = () => {
                 </div>
 
                 {/* Apply Button */}
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleApplyClick}
-                    variant={isApplied ? 'secondary' : 'primary'}
-                    disabled={isApplied}
-                    className="px-8 py-3 text-lg"
-                  >
-                    {isApplied ? (
-                      <span className="flex items-center">
-                        <FaCheckCircle className="mr-2" /> Applied
-                      </span>
-                    ) : (
-                      'Apply Now'
-                    )}
-                  </Button>
+                <div className="flex justify-end space-x-4">
+                  {isApplied ? (
+                    <>
+                      <Button
+                        onClick={handleToggleSave}
+                        variant="secondary"
+                        className="px-6 py-3"
+                      >
+                        {isSaved ? (
+                          <span className="flex items-center">
+                            <FaBookmark className="mr-2" /> Saved
+                          </span>
+                        ) : (
+                          <span className="flex items-center">
+                            <FaRegBookmark className="mr-2" /> Save
+                          </span>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={handleApplyClick}
+                        variant="primary"
+                        className="px-6 py-3"
+                      >
+                        <span className="flex items-center">
+                          <FaCheckCircle className="mr-2" /> Edit Application
+                        </span>
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={handleApplyClick}
+                      variant="primary"
+                      disabled={isSubmitting}
+                      className="px-8 py-3 text-lg"
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center">
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" 
+                              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Submitting...
+                        </span>
+                      ) : (
+                        'Apply Now'
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -489,8 +655,19 @@ const JobDetailPage: React.FC = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         job={job}
-        onApply={handleConfirmApplication}
+        onApply={currentApplication ? 
+          (cv, coverLetter) => handleEditApplication(currentApplication?.id, cv, coverLetter) : 
+          handleConfirmApplication}
+        isEditing={!!currentApplication}
+        existingApplication={currentApplication ? {
+            cvOption: currentApplication.custom_cv_url ? 'custom' : 'default',
+            customCvUrl: currentApplication.custom_cv_url || undefined,
+            coverLetterText: currentApplication.cover_letter_text || undefined,
+            coverLetterFileUrl: currentApplication.cover_letter_file_url || undefined
+          } : undefined}
       />
+
+      
     </div>
   );
 };

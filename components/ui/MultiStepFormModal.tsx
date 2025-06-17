@@ -211,7 +211,6 @@ const MultiStepFormModal: React.FC<MultiStepFormModalProps> = ({
         className="absolute inset-0 bg-black bg-opacity-70"
         onClick={handleCloseAttempt}
       />
-
       {/* Confirmation Modal - appears on top */}
       <AnimatePresence>
         {showCloseConfirm && (
@@ -275,8 +274,6 @@ const MultiStepFormModal: React.FC<MultiStepFormModalProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-
-
       {/* Main Modal */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -401,4 +398,8 @@ const MultiStepFormModal: React.FC<MultiStepFormModalProps> = ({
   );
 };
 
+
 export default MultiStepFormModal;
+
+
+

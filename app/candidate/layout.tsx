@@ -52,6 +52,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
       <Header /> {/* Votre Header pour le layout candidat */}
       <main className="flex-grow">
         {children} {/* Les pages (profile/page.tsx, profile/edit/page.tsx, etc.) */}
+        
       </main>
       <Footer /> {/* Votre Footer pour le layout candidat */}
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState } from 'react';
@@ -60,7 +61,7 @@ export default function ChatBot({ jobs, pageContext }: { jobs: Job[], pageContex
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer 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',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -104,7 +105,7 @@ export default function ChatBot({ jobs, pageContext }: { jobs: Job[], pageContex
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-4 right-4 z-500">
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}

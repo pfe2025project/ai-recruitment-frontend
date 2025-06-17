@@ -37,6 +37,7 @@ export async function checkCVUploadStatus(): Promise<boolean> {
 export const fetchExistingCVFromBackend = async (): Promise<{ url: string; file: File } | null> => {
   const token = await getSupabaseAccessToken();
   if (!token) return null;
+  
 
   try {
     // Step 1: Get the CV URL
