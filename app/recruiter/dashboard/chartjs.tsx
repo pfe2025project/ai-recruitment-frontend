@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -10,23 +10,52 @@ import {
 } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
 
-// تسجيل العناصر المطلوبة
+
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 const DashboardLayout = () => {
-  // بيانات مخطط Application Progression (دائري)
+
+
+  const [dataa , setDataa] =useState({});
+
+ async function getData(){
+ const res = await fetch(`http://localhost:5000/api/dashboard/application-progression`);
+ const data = await res.json();
+ setDataa(data);
+
+
+
+return data ;
+ 
+ 
+
+
+  }
+
+
+
+
+useEffect(
+  ()=>{
+   getData();
+},[])
+
+
+
+
+
+
   const applicationProgressData = {
     labels: ['Applied', 'Round1 Shortlisted', 'Round2 Shortlisted'],
     datasets: [
       {
-        data: [400, 150, 50],
+        data: [dataa?.applied, dataa?.shortlisted_round1, dataa?.shortlisted_round2],
         backgroundColor: ['#6377F2', '#A9B5F4', '#D6DCFA'],
         borderWidth: 0,
       },
     ],
   };
 
-  // بيانات مخطط Source of Hire (شريطي أفقي)
   const sourceOfHireData = {
     labels: ['Company Website', 'Job Boards', 'Social Media', 'Career Fair', 'Referrals'],
     datasets: [
@@ -63,76 +92,76 @@ const DashboardLayout = () => {
         </div>
       </div>
 
- 
-
-    
-  <div className="">
-  {/* Header */}
-  <h1 className="text-2xl font-bold">Source of Hire</h1>
-  {/* Chart Bars */}
-  <div className="space-y-3">
-    <div className="flex items-center justify-between">
-      <span className="flex items-center">
-        <span className="inline-block h-4 w-4 rounded-full company-website mr-2" />
-        Company Website
-      </span>
-      <span className="font-medium">100 (30%)</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="chart-bar company-website w-3/4" />
-    </div>
-    <div className="flex items-center justify-between mt-4">
-      <span className="flex items-center">
-        <span className="inline-block h-4 w-4 rounded-full job-boards mr-2" />
-        Job Boards
-      </span>
-      <span className="font-medium">50 (5%)</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="chart-bar job-boards w-1/4" />
-    </div>
-    <div className="flex items-center justify-between mt-4">
-      <span className="flex items-center">
-        <span className="inline-block h-4 w-4 rounded-full social-media mr-2" />
-        Social Media
-      </span>
-      <span className="font-medium">80 (20%)</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="chart-bar social-media w-2/5" />
-    </div>
-    <div className="flex items-center justify-between mt-4">
-      <span className="flex items-center">
-        <span className="inline-block h-4 w-4 rounded-full career-fair mr-2" />
-        Career Fair
-      </span>
-      <span className="font-medium">100 (30%)</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="chart-bar career-fair w-3/4" />
-    </div>
-    <div className="flex items-center justify-between mt-4">
-      <span className="flex items-center">
-        <span className="inline-block h-4 w-4 rounded-full referrals mr-2" />
-        Referrals
-      </span>
-      <span className="font-medium">70 (15%)</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="chart-bar referrals w-3/5" />
-    </div>
-  </div>
-  {/* Total */}
-  <div className="mt-6 text-right">
-    <strong>Total:</strong> 400
-  </div>
-</div>
 
 
-</div>
+
+      <div className="">
+        {/* Header */}
+        <h1 className="text-2xl font-bold">Source of Hire</h1>
+        {/* Chart Bars */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center">
+              <span className="inline-block h-4 w-4 rounded-full company-website mr-2" />
+              Company Website
+            </span>
+            <span className="font-medium">100 (30%)</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full overflow-hidden">
+            <div className="chart-bar company-website w-3/4" />
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <span className="flex items-center">
+              <span className="inline-block h-4 w-4 rounded-full job-boards mr-2" />
+              Job Boards
+            </span>
+            <span className="font-medium">50 (5%)</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full overflow-hidden">
+            <div className="chart-bar job-boards w-1/4" />
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <span className="flex items-center">
+              <span className="inline-block h-4 w-4 rounded-full social-media mr-2" />
+              Social Media
+            </span>
+            <span className="font-medium">80 (20%)</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full overflow-hidden">
+            <div className="chart-bar social-media w-2/5" />
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <span className="flex items-center">
+              <span className="inline-block h-4 w-4 rounded-full career-fair mr-2" />
+              Career Fair
+            </span>
+            <span className="font-medium">100 (30%)</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full overflow-hidden">
+            <div className="chart-bar career-fair w-3/4" />
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <span className="flex items-center">
+              <span className="inline-block h-4 w-4 rounded-full referrals mr-2" />
+              Referrals
+            </span>
+            <span className="font-medium">70 (15%)</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full overflow-hidden">
+            <div className="chart-bar referrals w-3/5" />
+          </div>
+        </div>
+        {/* Total */}
+        <div className="mt-6 text-right">
+          <strong>Total:</strong> 400
+        </div>
+      </div>
 
 
-    );
+    </div>
+
+
+  );
 };
 
 export default DashboardLayout;

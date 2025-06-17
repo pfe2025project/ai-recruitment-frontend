@@ -56,24 +56,71 @@ return data ;
 
 
 
-useEffect(()=>{
+useEffect(
+  ()=>{
    getData();
 },[])
 
 
 
- console.log(dataa);
 
+  const [dataOAc , setDataOAc] =useState({});
+
+ async function getDataOAc(){
+ const res = await fetch(`http://localhost:5000/api/dashboard/offer-acceptance`);
+ const data = await res.json();
+ setDataOAc(data);
+
+
+
+return data ;
+ 
+ 
+
+
+  }
+
+
+
+
+useEffect(
+  ()=>{
+   getDataOAc();
+},[])
  
   
+  
+  const [dataOAcc , setDataOAcc] =useState({});
+
+ async function getDataOAcc(){
+ const res = await fetch(`http://localhost:5000/api/dashboard/lgbtq-inclusion`);
+ const data = await res.json();
+ setDataOAcc(data);
 
 
+
+return data ;
+ 
+ 
+
+
+  }
+
+
+
+
+useEffect(
+  ()=>{
+   getDataOAcc();
+},[])
+ 
+
+ 
 
 
 
   const data = {
-    labels: [
-      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+    labels: [      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
       'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
     ],
     datasets: [
@@ -177,10 +224,10 @@ useEffect(()=>{
 
 
   const acceptedData = {
-    labels: ["Accepted", "Pending"],
+    labels: ["Accepted", "Rejected"],
     datasets: [
       {
-        data: [75, 25],
+        data: [dataOAc?.accepted, dataOAc?.rejected],
         backgroundColor: ["#34d399", "#e5e7eb"], // أخضر + رمادي
         borderWidth: 0,
       },
@@ -191,7 +238,7 @@ useEffect(()=>{
     labels: ["Pending", "Others"],
     datasets: [
       {
-        data: [15, 85],
+        data: [dataOAc?.pending, dataOAc?.total],
         backgroundColor: ["#3b82f6", "#e5e7eb"], // أزرق + رمادي
         borderWidth: 0,
       },
@@ -202,7 +249,7 @@ useEffect(()=>{
     labels: ["Applied", "Interview", "Hired"],
     datasets: [
       {
-        data: [30, 20, 10],
+        data: [dataOAcc?.applied, dataOAcc?.hired, dataOAcc?.interviewed],
         backgroundColor: ["#93c5fd", "#a5f3fc", "#38bdf8"],
         borderWidth: 6,
         borderColor: "#fff",
