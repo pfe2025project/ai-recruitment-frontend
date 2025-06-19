@@ -33,7 +33,7 @@ export const updateFullProfile = async (profileData: any) => {
 // ======= BASIC INFO =======
 export const getBasicInfo = async () => {
   const headers = await authHeaders();
-  const res = await fetch(`${FLASK_API_BASE_URL}/basic`, { headers });
+  const res = await fetch(`${FLASK_API_BASE_URL}`, { headers });
   return await res.json();
 };
 
