@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import { MdWork, MdLocationOn, MdCalendarToday, MdAccessTime, MdPeople, MdEmail, MdLanguage } from 'react-icons/md';
 import { FaMoneyBillAlt, FaArrowLeft, FaCheckCircle, FaBookmark, FaRegBookmark, FaStar, FaLinkedin, FaGlobe, FaTimes } from 'react-icons/fa';
 import { IoDiamondOutline } from 'react-icons/io5';
-import { fetchJobById, fetchRecommendedJobs } from '@/lib/api/job';
+import { fetchJobById } from '@/lib/api/job';
 import { Job } from '@/types/Job';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ApplyModal from '@/components/candidate/application/ApplyModal';
@@ -109,8 +109,9 @@ const JobDetailPage: React.FC = () => {
 
         // Fetch similar jobs
         setLoadingSimilar(true);
-        const similar = await fetchRecommendedJobs();
-        setSimilarJobs(similar.filter(j => j.id !== jobId).slice(0, 3));
+      
+        // The 'similar' variable is not defined in this scope. This line should be removed or replaced with actual similar job fetching logic.
+      // setSimilarJobs(similar.filter(j => j.id !== jobId).slice(0, 3));
       } catch (err) {
         setError('Failed to load job details');
         console.error('Error:', err);
