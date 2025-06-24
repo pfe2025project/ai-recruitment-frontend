@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaSearch, FaFilter, FaMapMarkerAlt, FaBriefcase, FaMoneyBillWave, FaRegClock, FaStar, FaRegStar } from 'react-icons/fa';
 import { IoMdTime } from 'react-icons/io';
+import ToggleSwitch from '@/components/ui/ToggleSwitch';
 import JobCard from '@/components/candidate/jobs/JobCard';
 import { Job } from '@/types/Job';
 import { fetchJobs } from '@/lib/api/job';
@@ -163,14 +164,6 @@ const JobSearchPage = () => {
             <FaFilter className="mr-2 text-blue-600" />
             {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
-
-          <button
-            onClick={() => setShowRecommendedOnly(prev => !prev)}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-lg shadow-sm font-medium transition-colors ${showRecommendedOnly ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-white text-gray-800 border border-gray-200 hover:bg-gray-50'}`}
-          >
-            {showRecommendedOnly ? <FaStar className="mr-2" /> : <FaRegStar className="mr-2" />}
-            {showRecommendedOnly ? 'Showing Recommended' : 'Show Recommended'}
-          </button>
         </div>
       </div>
 
@@ -193,7 +186,14 @@ const JobSearchPage = () => {
                 </button>
               </div>
 
-
+              {/* Recommended Jobs Toggle */}
+              <div className="mb-6">
+                <ToggleSwitch
+                  isOn={showRecommendedOnly}
+                  handleToggle={() => setShowRecommendedOnly(prev => !prev)}
+                  label="Recommended Jobs"
+                />
+              </div>
 
               {/* Location Filter */}
               <div className="mb-6">
