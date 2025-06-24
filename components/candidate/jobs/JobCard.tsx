@@ -70,7 +70,7 @@ const JobCard: React.FC<JobCardProps> = ({
       className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 relative group"
     >
       {/* Badges in top-right corner */}
-      <div className="absolute top-4 right-4 z-10 space-y-2">
+      <div className="absolute top-20 right-4 z-10 space-y-2">
         {isFeatured && (
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center shadow-md">
             <RiStarFill className="mr-1" /> Featured
@@ -89,8 +89,8 @@ const JobCard: React.FC<JobCardProps> = ({
       </div>
 
       {/* Match Score - Top right corner (below badges) */}
-      {/* {matchScore && (
-        <div className="absolute top-16 right-4 z-10">
+      {matchScore !== undefined && matchScore !== null && (
+        <div className="absolute top-4 right-4 z-10">
           <div 
             className={`w-14 h-14 rounded-full ${getScoreColor(matchScore)} flex flex-col items-center justify-center shadow-lg border-2 border-white transform hover:scale-110 transition-transform`}
             title={getScoreMessage(matchScore) ?? undefined}
@@ -98,7 +98,7 @@ const JobCard: React.FC<JobCardProps> = ({
             <span className="font-bold text-lg leading-none">{matchScore}%</span>
           </div>
         </div>
-      )} */}
+      )}
 
       <div className="p-6">
         <div className="flex justify-between items-start">

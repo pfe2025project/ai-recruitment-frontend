@@ -4,14 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaSearch, FaFilter, FaMapMarkerAlt, FaBriefcase, FaMoneyBillWave, FaRegClock, FaStar, FaRegStar } from 'react-icons/fa';
 import { IoMdTime } from 'react-icons/io';
+import ToggleSwitch from '@/components/ui/ToggleSwitch';
 import JobCard from '@/components/candidate/jobs/JobCard';
 import { Job } from '@/types/Job';
-import { fetchJobs, fetchRecommendedJobs } from '@/lib/api/job';
+import { fetchJobs } from '@/lib/api/job';
 
 const JobSearchPage = () => {
   const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [showRecommendedOnly, setShowRecommendedOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
@@ -21,7 +23,7 @@ const JobSearchPage = () => {
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showRecommendedOnly, setShowRecommendedOnly] = useState(true);
+
 
   // Fetch jobs based on filters
   const fetchJobsData = async () => {
@@ -37,11 +39,9 @@ const JobSearchPage = () => {
       };
       
       const jobsData = await fetchJobs(params);
+      console.log('Fetched jobs data:', jobsData);
       setJobs(jobsData);
-      setFilteredJobs(showRecommendedOnly ? 
-        jobsData.filter(job => job.is_recommended) : 
-        jobsData
-      );
+      setFilteredJobs(showRecommendedOnly ? jobsData.filter(job => job.is_recommended) : jobsData);
     } catch (error) {
       console.error('Error fetching jobs:', error);
     } finally {
@@ -50,39 +50,18 @@ const JobSearchPage = () => {
   };
 
   // Fetch recommended jobs
-  const fetchRecommendedJobsData = async () => {
-    setLoading(true);
-    try {
-      const recommendedJobs = await fetchRecommendedJobs();
-      setJobs(recommendedJobs);
-      setFilteredJobs(recommendedJobs);
-    } catch (error) {
-      console.error('Error fetching recommended jobs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Initial load and when recommended toggle changes
   useEffect(() => {
-    if (showRecommendedOnly) {
-      fetchRecommendedJobsData();
-    } else {
       fetchJobsData();
-    }
-  }, [showRecommendedOnly]);
+    }, [showRecommendedOnly]);
 
   // When filters change
   useEffect(() => {
-    if (!showRecommendedOnly) {
-      fetchJobsData();
-    }
-  }, [searchTerm, location, contractType, workModes, minSalary, currentPage]);
+    fetchJobsData();
+  }, [searchTerm, location, contractType, workModes, minSalary, currentPage, showRecommendedOnly]);
 
-  const toggleRecommended = () => {
-    const newShowRecommended = !showRecommendedOnly;
-    setShowRecommendedOnly(newShowRecommended);
-  };
+
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -185,17 +164,6 @@ const JobSearchPage = () => {
             <FaFilter className="mr-2 text-blue-600" />
             {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
-          <button
-            onClick={toggleRecommended}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-lg shadow-sm font-medium transition-colors ${
-              showRecommendedOnly 
-                ? 'bg-blue-600 text-white border border-blue-700 hover:bg-blue-700' 
-                : 'bg-white text-gray-800 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            {showRecommendedOnly ? <FaStar className="mr-2" /> : <FaRegStar className="mr-2" />}
-            {showRecommendedOnly ? 'Recommended' : 'All Jobs'}
-          </button>
         </div>
       </div>
 
@@ -219,36 +187,12 @@ const JobSearchPage = () => {
               </div>
 
               {/* Recommended Jobs Toggle */}
-              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <label className="flex items-center cursor-pointer">
-                  <div className="relative">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only" 
-                      checked={showRecommendedOnly}
-                      onChange={toggleRecommended}
-                    />
-                    <div className={`block w-14 h-8 rounded-full transition-colors ${
-                      showRecommendedOnly ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}></div>
-                    <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform shadow-sm ${
-                      showRecommendedOnly ? 'transform translate-x-6' : ''
-                    }`}></div>
-                  </div>
-                  <div className="ml-3 text-gray-700 font-medium flex items-center">
-                    {showRecommendedOnly ? (
-                      <FaStar className="text-yellow-400 mr-2" />
-                    ) : (
-                      <FaRegStar className="text-gray-400 mr-2" />
-                    )}
-                    Recommended Jobs
-                  </div>
-                </label>
-                <p className="mt-2 text-xs text-gray-500">
-                  {showRecommendedOnly 
-                    ? "Showing jobs tailored to your profile" 
-                    : "Showing all available jobs"}
-                </p>
+              <div className="mb-6">
+                <ToggleSwitch
+                  isOn={showRecommendedOnly}
+                  handleToggle={() => setShowRecommendedOnly(prev => !prev)}
+                  label="Recommended Jobs"
+                />
               </div>
 
               {/* Location Filter */}
@@ -350,12 +294,10 @@ const JobSearchPage = () => {
               <h2 className="text-xl font-semibold text-gray-800">
                 {loading ? 'Loading...' : (
                   <>
-                    {showRecommendedOnly ? (
-                      <span className="flex items-center">
+                    <span className="flex items-center">
                         <FaStar className="text-yellow-400 mr-2" />
                         Recommended For You
                       </span>
-                    ) : 'All Job Listings'}
                     <span className="ml-2 text-sm font-normal text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
                       {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'}
                     </span>
@@ -408,24 +350,13 @@ const JobSearchPage = () => {
                   <FaSearch className="text-blue-600 text-2xl" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-800 mb-2">
-                  {showRecommendedOnly 
-                    ? "No recommended jobs found" 
-                    : "No jobs match your criteria"}
+                  No recommended jobs found
                 </h3>
                 <p className="text-gray-600 mb-4 max-w-md mx-auto">
-                  {showRecommendedOnly
-                    ? "We couldn't find jobs matching your profile. Try browsing all jobs or updating your profile."
-                    : "Try adjusting your search filters or expanding your search criteria."}
+                  We couldn't find jobs matching your profile. Try browsing all jobs or updating your profile.
                 </p>
                 <div className="flex justify-center gap-3">
-                  {showRecommendedOnly && (
-                    <button
-                      onClick={() => setShowRecommendedOnly(false)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Browse All Jobs
-                    </button>
-                  )}
+
                   <button
                     onClick={clearFilters}
                     className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
