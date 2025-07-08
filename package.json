@@ -10,6 +10,7 @@
     "postinstall": "node scripts/patch-unicode-properties.js"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "@supabase/supabase-js": "^2.49.8",
     "axios": "^1.9.0",
     "force": "^0.0.3",

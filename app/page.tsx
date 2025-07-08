@@ -13,8 +13,8 @@ export default function HomePage() {
       {/* Header and Footer are already included via layout.tsx,
           but if you need to pass specific props or control their visibility,
           you might adjust layout.tsx or pass props down. */}
-      {/* <Header />  -> This is in layout.tsx */}
-      <Header />
+      {/*   -> This is in layout.tsx */}
+
       <main className="flex-grow">
           <HeroSection />
           <HowItWorks />

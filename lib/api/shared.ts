@@ -1,7 +1,9 @@
 import { getAccessToken } from './auth';
 
+import { getSupabaseAccessToken } from "./auth";
+
 export async function fetchUserProfile() {
-  const token = getAccessToken();
+  const token = await getSupabaseAccessToken();
   const res = await fetch('http://127.0.0.1:5000/profile', {
     headers: {
       'Content-Type': 'application/json',

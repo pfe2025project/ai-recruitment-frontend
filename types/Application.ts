@@ -5,7 +5,7 @@ export interface Application {
   id: string;
   job_id: string;
   candidate_id: string;
-  status: 'pending' | 'reviewed' |'interview'| 'accepted' | 'rejected' | 'withdrawn'; // Add other possible statuses
+  status: 'pending' | 'reviewed' | 'accepted' | 'rejected' | 'withdrawn';
   custom_cv_url?: string | null;
   cover_letter_text?: string | null;
   cover_letter_file_url?: string | null;

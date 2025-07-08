@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Job } from '@/types/Job';
 import { fetchJobs } from '@/lib/api/job';
-import { useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 type Message = {
   content: string;
@@ -71,9 +71,14 @@ export default function ChatBot({ pageContext }: { pageContext?: string }) {
     return /(job|position|frontend|backend|fullstack|react|node|location)/i.test(query);
   };
 
+  const { user, role } = useAuth();
+
   const fetchAIResponse = async (query: string) => {
-    // Attach page context to the prompt for better AI awareness
-    const contextPrompt = pageContext ? `You are currently on the page: ${pageContext}. ` : '';
+    // Attach page context and user role to the prompt for better AI awareness
+    let contextPrompt = pageContext ? `You are currently on the page: ${pageContext}. ` : '';
+    if (user && role) {
+      contextPrompt += `The current user is a ${role}. `;
+    }
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {

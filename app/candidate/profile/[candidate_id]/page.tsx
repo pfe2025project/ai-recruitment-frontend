@@ -4,7 +4,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react'; // Import useState
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import ProfileHeader from '@/components/candidate/profile/ProfileHeader';
 import ProfileSection from '@/components/candidate/profile/ProfileSection';
 import ExperienceCard from '@/components/candidate/profile/ExperienceCard';
@@ -31,11 +31,17 @@ import { fetchprofiledata } from '@/lib/data/profile';
 import { useProfile } from '@/context/ProfileContext';
 import MultiStepFormModal from '@/components/ui/MultiStepFormModal';
 import { steps } from '@/lib/candidate/config/steps';
+import { updateApplicationStatus } from '@/lib/api/application';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const ProfilePage: React.FC = () => {
+  const params = useParams();
+  const candidateId = params.candidate_id as string;
   const router = useRouter();
-  const { profileData, setProfileData, handleProfileDataChange, handleContactInfoChange, handleJobPreferencesChange } = useProfile();
+
+  const { profileData, handleProfileDataChange, handleContactInfoChange, handleJobPreferencesChange } = useProfile();
   const [allskills, setAllskills] = useState<string[]>([])
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -51,7 +57,22 @@ const ProfilePage: React.FC = () => {
 
   const handleUploadCV = () => {
     setModalOpen(true);
+  };
 
+  const handleApplicationStatusChange = async (status: 'accepted' | 'rejected') => {
+    if (!profileData?.application_id) {
+      toast.error("Application ID is missing.");
+      return;
+    }
+    try {
+      await updateApplicationStatus(profileData.application_id, status);
+      toast.success(`Application ${status} successfully!`);
+      // Optionally, refresh profile data or redirect
+      router.push('/recruiter/jobs'); // Redirect to jobs dashboard after action
+    } catch (err) {
+      toast.error(`Failed to ${status} application.`);
+      console.error(err);
+    }
   };
 
  
@@ -59,20 +80,9 @@ const ProfilePage: React.FC = () => {
   
 
   useEffect(()=>{
-    const getProfile = async () => {
-      try {
-        const data = await fetchprofiledata();
-        if (data) {
-          setProfileData(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch profile data:", err);
-      }
-    };
-
-    getProfile();
-
-
+    if (candidateId) {
+      fetchprofiledata(profileData,handleProfileDataChange,handleJobPreferencesChange, candidateId);
+    }
 
     const combine_skills=()=>{
       const  s = [
@@ -172,6 +182,25 @@ const ProfilePage: React.FC = () => {
               lastUpdated={profileData.cvLastUpdated}
               cvUrl={profileData.cvPdfUrl} // Pass the actual URL
             />
+
+            {/* Application Actions for Recruiters */}
+            <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+              <h3 className="text-xl font-semibold text-neutral-800 mb-4">Application Actions</h3>
+              <div className="flex space-x-4">
+                <Button
+                  onClick={() => handleApplicationStatusChange('accepted')}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  Accept Application
+                </Button>
+                <Button
+                  onClick={() => handleApplicationStatusChange('rejected')}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  Refuse Application
+                </Button>
+              </div>
+            </div>
 
             {/* Job Preferences Card - NEW LOCATION */}
             <JobPreferencesCard {...profileData.jobPreferences} />

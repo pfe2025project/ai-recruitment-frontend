@@ -33,12 +33,12 @@ const JobSearchPage = () => {
         search: searchTerm,
         location,
         contract_type: contractType,
-        work_mode: workModes,
+        work_mode: workModes, // Ensure this is an array
         min_salary: minSalary,
         page: currentPage
       };
       
-      const jobsData = await fetchJobs(params);
+      const jobsData = await fetchJobs(params) || []; // Ensure jobsData is an array
       console.log('Fetched jobs data:', jobsData);
       setJobs(jobsData);
       setFilteredJobs(showRecommendedOnly ? jobsData.filter(job => job.is_recommended) : jobsData);
@@ -97,7 +97,7 @@ const JobSearchPage = () => {
 
   // Filter options
   const workModeOptions = [
-    { value: 'On site', label: 'On Site', icon: <FaMapMarkerAlt /> },
+    { value: 'On-site', label: 'On Site', icon: <FaMapMarkerAlt /> },
     { value: 'Remote', label: 'Remote', icon: <FaBriefcase /> },
     { value: 'Hybrid', label: 'Hybrid', icon: <IoMdTime /> }
   ];
@@ -321,7 +321,7 @@ const JobSearchPage = () => {
                     key={job.id}
                     id={job.id}
                     title={job.title}
-                    company={typeof job.company === 'object' ? job.company.name : job.company}
+                    company={job.company?.name || 'N/A'}
                     location={job.location}
                     postedDate={new Date(job.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -330,7 +330,7 @@ const JobSearchPage = () => {
                     })}
                     contractType={job.contract_type || 'Not specified'}
                     description={job.description}
-                    imageUrl={typeof job.company === 'object' ? job.company.logo_url : undefined}
+                    imageUrl={job.company?.logo_url}
                     salary={job.salary_range}
                     skills={job.skills}
                     isSaved={savedJobs.includes(job.id)}

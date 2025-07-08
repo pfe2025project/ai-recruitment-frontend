@@ -22,9 +22,9 @@ export default function LoginPage() {
     if (isAuthenticated()) {
       const storedRole = getRole(); // Utilise la fonction getRole de lib/api/auth
       if (storedRole === 'candidate') {
-        router.push('/candidate/dashboard');
+        router.push('/');
       } else if (storedRole === 'recruiter') {
-        router.push('/recruiter/dashboard');
+        router.push('/');
       } else {
         // Si le rôle n'est pas clair, peut-être déconnecter ou rediriger vers une page neutre
         // Pour l'instant, on redirige vers le login si le rôle est inconnu mais que isAuthenticated est true
@@ -54,8 +54,8 @@ export default function LoginPage() {
       const result = await loginUser(email, password, role);
       console.log('Login successful:', result);
 
-      // Redirection vers le tableau de bord spécifique au rôle
-      router.push(`/${role}/dashboard`);
+      // Redirection vers la page d'accueil
+      router.push('/');
     } catch (err: any) {
       if (err instanceof TypeError && err.message === "Failed to fetch") {
           setError("Le serveur n'est pas disponible. Veuillez réessayer plus tard.");

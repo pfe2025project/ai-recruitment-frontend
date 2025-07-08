@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { 
   FiBriefcase, 
   FiUsers, 
@@ -32,6 +33,7 @@ export default function CandidateDashboard() {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const { profileData, handleProfileDataChange, handleContactInfoChange, handleJobPreferencesChange } = useProfile();
+  const { user, loading } = useAuth(); // Destructure user and loading from useAuth
   const router = useRouter();
 
   // Stats importantes pour le candidat
@@ -134,21 +136,28 @@ export default function CandidateDashboard() {
   };
 
   useEffect(() => {
-    const accessToken = getAccessToken();
-    setToken(accessToken);
+    if (!loading) { // Only proceed if authentication state has been determined
+      if (!user) {
+        router.push('/login'); // Redirect to login if not authenticated
+        return;
+      }
 
-    fetchprofiledata(profileData,handleProfileDataChange,handleJobPreferencesChange);
+      const accessToken = getAccessToken();
+      setToken(accessToken);
 
-    const checkCV = async () => {
-      const uploaded = await checkCVUploadStatus();
-      setCvUploaded(uploaded);
-      setModalOpen(!uploaded);
-    };
+      fetchprofiledata(profileData, handleProfileDataChange, handleJobPreferencesChange);
 
-    if (accessToken) checkCV();
-  }, []);
+      const checkCV = async () => {
+        const uploaded = await checkCVUploadStatus();
+        setCvUploaded(uploaded);
+        setModalOpen(!uploaded);
+      };
 
-  if (cvUploaded === null) {
+      if (accessToken) checkCV();
+    }
+  }, [loading, user, router]);
+
+  if (loading || cvUploaded === null) {
     return <div className="text-center mt-10">Chargement...</div>;
   }
 

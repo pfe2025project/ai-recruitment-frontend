@@ -7,34 +7,29 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RoleToggle from '@/components/auth/RoleToggle';
 import AuthForm from '@/components/auth/AuthForm';
-import { isAuthenticated, registerUser, getRole } from '@/lib/api/auth'; // Importez getRole
+import { isAuthenticated, registerUser, getRole } from '@/lib/api/auth';
 import Loader from '@/components/ui/loader';
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'candidate' | 'recruiter'>('candidate');
   const [error, setError] = useState('');
-  const router = useRouter(); 
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Vérifie si l'utilisateur est déjà authentifié au chargement de la page
     if (isAuthenticated()) {
-      const storedRole = getRole(); // Utilise la fonction getRole de lib/api/auth
+      const storedRole = getRole();
       if (storedRole === 'candidate') {
-        router.push('/candidate/dashboard');
+        router.push('/');
       } else if (storedRole === 'recruiter') {
-        router.push('/recruiter/dashboard');
-      } else {
-        // Si le rôle n'est pas clair, peut-être déconnecter ou rediriger vers une page neutre
-        setLoading(false);
+        router.push('/');
       }
-    } else {
-      setLoading(false); // Arrête le chargement si non authentifié
     }
-  }, [router]); // Supprime `loading` des dépendances car il est mis à jour à l'intérieur
+    setLoading(false);
+  }, [router]);
 
   if (loading) {
-    return <Loader role='candidate' />; // Vous pouvez ajuster le 'role' ici si nécessaire
+    return <Loader role='candidate' />;
   }
 
   const handleSubmit = async (
@@ -57,7 +52,7 @@ export default function RegisterPage() {
       // Si Supabase nécessite une confirmation par e-mail, 'result.session' sera null.
       if (result.session) {
         // Redirection vers le tableau de bord si une session est immédiatement disponible
-        router.push(`/${role}/dashboard`);
+        router.push('/');
       } else {
         // Si une confirmation par e-mail est nécessaire, affichez un message à l'utilisateur
         setError(result.message || "Inscription réussie ! Veuillez vérifier votre e-mail pour confirmer votre compte.");

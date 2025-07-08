@@ -1,23 +1,19 @@
 "use client";
 // components/candidate/UploadCVSection.tsx
 import React, { useState } from 'react';
-import { Document, Page } from 'react-pdf';
-import { pdfjs } from 'react-pdf';
 import Button from '../../ui/Button';
 import FileUploadIcon from '../../icons/FileUploadIcon';
 import PdfViewerModal from '../../ui/PdfViewerModal';
-// Set the workerSrc to the CDN version to avoid import issues
-pdfjs.GlobalWorkerOptions.workerSrc = '/libs/pdfjs/pdf.worker.min.mjs';
 
 // Helper pour extraire le nom de fichier depuis l'URL
-const extractFileNameFromUrl = (url: string): string => {
+const getFileNameFromUrl = (url: string) => {
   try {
-    // Gère les URLs complètes et les paths relatifs
-    const pathname = new URL(url, window.location.origin).pathname;
-    return pathname.split('/').pop() || "document.pdf";
-  } catch {
-    // Fallback pour les strings non-URL (comme des object URLs)
-    return url.split('/').pop() || "document.pdf";
+    const urlObj = new URL(url);
+    const pathSegments = urlObj.pathname.split('/');
+    return pathSegments[pathSegments.length - 1];
+  } catch (error) {
+    console.error("Invalid URL for file name extraction:", url);
+    return "document.pdf";
   }
 };
 
@@ -27,20 +23,20 @@ interface UploadCVSectionProps {
   cvUrl?: string;
 }
 
-const UploadCVSection: React.FC<UploadCVSectionProps> = ({ 
-  onUploadCV, 
+const UploadCVSection: React.FC<UploadCVSectionProps> = ({
+  onUploadCV,
   lastUpdated,
   cvUrl
 }) => {
-  const [isViewerOpen, setIsViewerOpen] = useState(false);
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber] = useState(1); // Toujours afficher la première page
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
-    setNumPages(numPages);
-  }
+  const handleViewCV = () => {
+    setIsPdfModalOpen(true);
+  };
 
-  const fileName = extractFileNameFromUrl(cvUrl || "");
+  const handleClosePdfModal = () => {
+    setIsPdfModalOpen(false);
+  };
 
   return (
     <div className="bg-white p-6 md:p-8 rounded-lg shadow-md mb-8">
@@ -56,48 +52,30 @@ const UploadCVSection: React.FC<UploadCVSectionProps> = ({
           )}
         </p>
 
-        {cvUrl && (
-          <div 
-            className="cursor-pointer max-w-md"
-            onClick={() => setIsViewerOpen(true)}
-          >
-            <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              {/* Prévisualisation de la première page du PDF */}
-              <div className="bg-gray-100 flex items-center justify-center">
-                <div className="w-full">
-                  <Document
-                    file={cvUrl}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    loading={<div className="h-48 flex items-center justify-center">Chargement...</div>}
-                    error={<div className="h-48 flex items-center justify-center text-red-500">Erreur de chargement</div>}
-                  >
-                    <Page 
-                      pageNumber={pageNumber} 
-                      width={350}
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
-                    />
-                  </Document>
-                </div>
-              </div>
-              
-              {/* Nom du fichier en bas */}
-              <div className="bg-white p-3 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-900 truncate">{fileName}</p>
-                <p className="text-xs text-gray-500">
-                  PDF {numPages && `• ${numPages} page${numPages > 1 ? 's' : ''}`}
-                </p>
-              </div>
+        {cvUrl ? (
+          <>
+            <div className="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-200 rounded-md bg-gray-50">
+              <span className="text-neutral-700 font-medium mb-2 md:mb-0">
+                {getFileNameFromUrl(cvUrl)}
+              </span>
+              <Button onClick={handleViewCV} variant="secondary">
+                Voir le CV
+              </Button>
             </div>
-          </div>
+            <div className="mt-4 w-full h-64 border border-gray-300 rounded-md overflow-hidden">
+              <iframe src={cvUrl} width="100%" height="100%" title="CV Preview" />
+            </div>
+          </>
+        ) : (
+          <p className="text-neutral-500">Aucun CV n'a été uploadé pour le moment.</p>
         )}
       </div>
 
       {/* Bouton Upload en bas */}
       <div className="flex justify-end">
-        <Button 
-          onClick={onUploadCV} 
-          variant="primary" 
+        <Button
+          onClick={onUploadCV}
+          variant="primary"
           className="flex items-center justify-center"
         >
           <FileUploadIcon className="w-5 h-5 mr-2" />
@@ -105,11 +83,11 @@ const UploadCVSection: React.FC<UploadCVSectionProps> = ({
         </Button>
       </div>
 
-      {/* Modal pour visualiser le PDF complet */}
-      {isViewerOpen && cvUrl && (
-        <PdfViewerModal 
-          pdfUrl={cvUrl} 
-          onClose={() => setIsViewerOpen(false)} 
+      {cvUrl && isPdfModalOpen && (
+        <PdfViewerModal
+          pdfUrl={cvUrl}
+          onClose={handleClosePdfModal}
+          fileName={getFileNameFromUrl(cvUrl)}
         />
       )}
     </div>

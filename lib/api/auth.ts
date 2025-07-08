@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // lib/api/auth.ts
+
 import { supabase } from '@/lib/supabase/client'
 import { User, Session } from '@supabase/supabase-js'; // Importation des types User et Session
 

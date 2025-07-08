@@ -48,38 +48,54 @@ export const createApplication = async (
       error: error instanceof Error ? error.message : 'Failed to submit application' 
     };
   }
+}
+
+export const updateApplicationStatus = async (applicationId: string, status: 'accepted' | 'rejected') => {
+  try {
+    const accessToken = await getSupabaseAccessToken();
+    if (!accessToken) {
+      throw new Error('No access token found.');
+    }
+
+    const response = await fetch(`${FLASK_API_BASE_URL}/application/${applicationId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Failed to update application status: ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`Error updating application status to ${status}:`, error);
+    throw error;
+  }
+
 };
+
+import { Application } from '@/types/Application';
+
+
 
 export const updateApplication = async (
   applicationId: string,
-  cvOption: 'default' | 'custom',
-  customCv?: File,
-  coverLetterText?: string,
-  coverLetterFile?: File
+  payload: { status: Application['status'] }
 ): Promise<{ success: boolean; error?: string }> => {
-  const formData = new FormData();
-  formData.append('cv_option', cvOption);
-  
-  if (cvOption === 'custom' && customCv) {
-    formData.append('custom_cv', customCv);
-  }
-  
-  if (coverLetterText) {
-    formData.append('cover_letter_text', coverLetterText);
-  }
-  
-  if (coverLetterFile) {
-    formData.append('cover_letter_file', coverLetterFile);
-  }
-
   try {
     const token = await getSupabaseAccessToken();
     const response = await fetch(`${FLASK_API_BASE_URL}/application/${applicationId}`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: formData,
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

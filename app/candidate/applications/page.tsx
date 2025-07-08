@@ -68,8 +68,7 @@ const MyApplicationsPage: React.FC = () => {
 
         // Récupérer les candidatures
         const appsResponse = await getUserApplications(user.id);
-        const apps = appsResponse.applications;
-        console.log(apps)
+        const apps = appsResponse.applications && Array.isArray(appsResponse.applications) ? appsResponse.applications : [];
         
         // Pour chaque candidature, récupérer les détails du job
         const appsWithJobs = await Promise.all(
@@ -99,7 +98,7 @@ const MyApplicationsPage: React.FC = () => {
   const getStatusColor = (status: Application['status']) => {
     switch (status) {
       case 'accepted': return 'bg-green-100 text-green-800';
-      case 'interview': return 'bg-blue-100 text-blue-800';
+      
       case 'rejected': return 'bg-red-100 text-red-800';
       case 'pending':
       default: return 'bg-yellow-100 text-yellow-800';
@@ -109,7 +108,7 @@ const MyApplicationsPage: React.FC = () => {
   const getStatusText = (status: Application['status']) => {
     switch (status) {
       case 'accepted': return 'Retenu';
-      case 'interview': return 'Entretien prévu';
+      
       case 'rejected': return 'Rejeté';
       case 'reviewed': return 'En revue';
       case 'pending': 
@@ -166,18 +165,7 @@ const MyApplicationsPage: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 py-10">
-        <div className="container mx-auto px-6 text-center">
-          <p className="text-red-500">{error}</p>
-          <Button onClick={() => router.push('/login')} className="mt-4">
-            Se connecter
-          </Button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
@@ -213,7 +201,7 @@ const MyApplicationsPage: React.FC = () => {
                   <tr key={app.id}>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        {app.job?.company.logo_url && (
+                        {app.job?.company?.logo_url && (
                           <Image
                             src={app.job.company.logo_url}
                             alt="Logo"
@@ -224,13 +212,13 @@ const MyApplicationsPage: React.FC = () => {
                         )}
                         <div className="ml-4">
                           <div className="font-medium">{app.job?.title || 'Offre non disponible'}</div>
-                          <div className="text-sm text-gray-500">{app.job?.location}</div>
+                          <div className="text-sm text-gray-500">{app.job?.location || 'N/A'}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div>{app.job?.company.name || 'N/A'}</div>
-                      <div className="text-sm text-gray-500">{app.job?.contract_type}</div>
+                      <div>{app.job?.company?.name || 'N/A'}</div>
+                      <div className="text-sm text-gray-500">{app.job?.contract_type || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(app.applied_at).toLocaleDateString('fr-FR')}
@@ -299,16 +287,16 @@ const MyApplicationsPage: React.FC = () => {
           {selectedApplication && (
             <div className="space-y-6">
               <div className="border-b pb-4">
-                <h2 className="text-2xl font-bold">{selectedApplication.job?.title}</h2>
-                <p className="text-gray-600">{selectedApplication.job?.company.name}</p>
+                <h2 className="text-2xl font-bold">{selectedApplication.job?.title || 'Offre non disponible'}</h2>
+                <p className="text-gray-600">{selectedApplication.job?.company?.name || 'N/A'}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="font-semibold mb-2">Détails de l'offre</h3>
                   <div className="space-y-2">
-                    <p><span className="font-medium">Localisation:</span> {selectedApplication.job?.location}</p>
-                    <p><span className="font-medium">Type de contrat:</span> {selectedApplication.job?.contract_type}</p>
+                    <p><span className="font-medium">Localisation:</span> {selectedApplication.job?.location || 'N/A'}</p>
+                    <p><span className="font-medium">Type de contrat:</span> {selectedApplication.job?.contract_type || 'N/A'}</p>
                     <p><span className="font-medium">Salaire:</span> {selectedApplication.job?.salary_range || 'Non spécifié'}</p>
                   </div>
                 </div>

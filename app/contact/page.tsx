@@ -6,7 +6,7 @@ import Footer from '@/components/shared/footer';
 export default function ContactPage() {
   return (
     <>
-      <Header />
+      
       <main className="flex-grow">
         <ContactSection />
       </main>

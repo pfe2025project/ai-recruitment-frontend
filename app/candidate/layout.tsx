@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccessToken, getRole } from '@/lib/api/auth';
 import Loader from '@/components/ui/loader'; // Assurez-vous que ce composant existe
-import Header from '@/components/shared/header'; // Importez votre composant Header
+
 import Footer from '@/components/shared/footer'; // Importez votre composant Footer
 
 export default function CandidateLayout({ children }: { children: React.ReactNode }) {
@@ -49,7 +49,7 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
   // Si autorisé, affiche le contenu avec le header et le footer
   return (
     <div className="min-h-screen flex flex-col">
-      <Header /> {/* Votre Header pour le layout candidat */}
+
       <main className="flex-grow">
         {children} {/* Les pages (profile/page.tsx, profile/edit/page.tsx, etc.) */}
         

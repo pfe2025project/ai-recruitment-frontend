@@ -53,7 +53,7 @@ const JobDetailPage: React.FC = () => {
       
       setIsApplied(!!userApplication);
       if (userApplication) {
-        setCurrentApplication(userApplication.id);
+        setCurrentApplication(userApplication);
       }
     } catch (error) {
       console.error("Error checking applications:", error);
@@ -279,20 +279,7 @@ const handleConfirmApplication = async (jobId: string, cv: File | string, coverL
       </div>
     )}
     
-    {applicationError && (
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg flex items-center">
-          <FaTimes className="mr-2" />
-          <span>{applicationError}</span>
-          <button 
-            onClick={() => setApplicationError(null)}
-            className="ml-4 text-red-700 hover:text-red-900"
-          >
-            &times;
-          </button>
-        </div>
-      </div>
-    )}
+
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
@@ -377,7 +364,7 @@ const handleConfirmApplication = async (jobId: string, cv: File | string, coverL
                     <div className="flex items-center space-x-2">
                       <IoDiamondOutline size={20} className="text-yellow-500" />
                       <span>
-                        Match Score: <strong>{job.match_score}%</strong>
+                        Match Score: <strong>{job.match_score.toFixed(0)}%</strong>
                       </span>
                     </div>
                   )}
@@ -636,7 +623,7 @@ const handleConfirmApplication = async (jobId: string, cv: File | string, coverL
                           {similarJob.match_score && (
                             <span className="flex items-center">
                               <IoDiamondOutline className="mr-1 text-yellow-500" />
-                              {similarJob.match_score}% match
+                              {similarJob.match_score.toFixed(0)}% match
                             </span>
                           )}
                         </div>

@@ -51,6 +51,7 @@ export interface ContactInfo {
 
 
 export interface ProfileData {
+  application_id?: string;
   name: string;
   title: string;
   location: string;

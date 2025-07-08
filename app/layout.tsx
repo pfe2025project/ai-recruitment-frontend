@@ -1,24 +1,34 @@
 // app/layout.tsx
-import { ProfileProvider } from '@/context/ProfileContext';
-import '../styles/globals.css';
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import '../styles/globals.css';
+import Header from '@/components/shared/header';
+import Footer from '@/components/shared/footer';
+import { AuthProvider } from '@/context/AuthContext';
+import { ProfileProvider } from '@/context/ProfileContext';
 import ChatBot from '@/components/ChatBot';
 
+const inter = Inter({ subsets: ['latin'] });
+
 export const metadata: Metadata = {
-  title: 'TalentConnect',
-  description: 'Connect Talent With Opportunity',
+  title: 'AI Recruitment Platform',
+  description: 'AI-powered platform for recruitment and job matching',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // You can enhance this context object with more info per page in the future
-  const pageContext = typeof window !== 'undefined' ? window.location.pathname : '';
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-white text-neutral-900">
-        <ProfileProvider>
-          {children}
-          <ChatBot pageContext={pageContext} />
-        </ProfileProvider>
+        <AuthProvider>
+          <ProfileProvider>
+            <Header />
+            {children}
+            <Footer />
+            {/* <ChatBot /> */}
+          </ProfileProvider>
+        </AuthProvider>
       </body>
     </html>
   );

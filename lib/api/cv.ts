@@ -1,6 +1,6 @@
 import {  getSupabaseAccessToken } from "./auth";
 
-const FLASK_API_BASE_URL = 'http://127.0.0.1:5000/cv';
+const FLASK_API_BASE_URL = 'http://127.0.0.1:5000/cv/';
 
 
 
@@ -50,11 +50,12 @@ export const fetchExistingCVFromBackend = async (): Promise<{ url: string; file:
     if (!urlRes.ok) throw new Error('Failed to fetch CV URL');
 
     const data = await urlRes.json();
-    const cvUrl = data.cv_url;
-    if (!cvUrl) return null;
+    const downloadUrl = data.cv_url;
+    console.log('fetchExistingCVFromBackend: Received downloadUrl from backend:', downloadUrl);
+    if (!downloadUrl) return null;
 
-    // Step 2: Fetch the actual file from the URL
-    const fileRes = await fetch(cvUrl, {
+    // Step 2: Fetch the actual file from the constructed URL
+    const fileRes = await fetch(downloadUrl, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -67,9 +68,9 @@ export const fetchExistingCVFromBackend = async (): Promise<{ url: string; file:
     // Create a File object (you can change the name or infer from URL if needed)
     const file = new File([blob], 'cv.pdf', { type: blob.type });
 
-    return { url: cvUrl, file };
+    return { url: downloadUrl, file };
   } catch (error) {
-    console.error('fetchExistingCVFromBackend:', error);
+    console.error('fetchExistingCVFromBackend error:', error);
     return null;
   }
 };
@@ -101,6 +102,7 @@ export const uploadCVToBackend = async (file: File): Promise<{ success: boolean;
     }
 
     const data = await res.json();
+    // The backend now returns the full web-accessible URL directly
     return { success: true, url: data.url };
   } catch (error) {
     console.error('uploadCVToBackend:', error);
